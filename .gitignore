@@ -1,0 +1,6 @@
+/.settings
+/.metadata
+/target
+.classpath
+.project
+*.wav

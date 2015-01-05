@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"></meta>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="resources/js/recorder.js"></script>
+<title>Sound capture</title>
+</head>
+<body>
+
+	<script type="text/javascript">
+		navigator.getUserMedia = navigator.getUserMedia
+				|| navigator.webkitGetUserMedia || navigator.mozGetUserMedia
+				|| navigator.msGetUserMedia;
+
+		function hasGetUserMedia() {
+			return navigator.getUserMedia;
+		}
+		
+		function log(message) {
+			if (console) {
+				var now = new Date();
+				console.log("INFO " + now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds() + "." + now.getMilliseconds() + " - " + message);
+			}
+		}
+
+		jQuery(document).ready(function() {
+			if (hasGetUserMedia()) {
+				log("Web Audio API is available");
+
+				navigator.getUserMedia({
+					audio : true
+				}, function(localMediaStream) {
+					var context = new webkitAudioContext();
+					var mediaStreamSource = context.createMediaStreamSource(localMediaStream);
+					var recorder = new Recorder(mediaStreamSource, {
+						workerPath: "resources/js/recorderWorker.js"
+					});
+					
+					log("Recorder created: " + recorder);
+					
+					log("Starting recording");
+					
+					recorder.record();
+					window.setInterval(function() {
+						recorder.exportWAV(function(blob) {
+							recorder.clear();
+
+							log("Resulting blob:\n" + blob);
+							var oReq = new XMLHttpRequest();
+							oReq.open("POST", "/capture", true);
+							oReq.onload = function (oEvent) {
+								log("Blob has been sent");
+							};
+							
+							var recordForm = new FormData();
+						    recordForm.append("audio", blob);
+							oReq.send(recordForm);
+						});
+					}, 2000);
+					
+// 				    var proc = context.createScriptProcessor(2048, 2, 2);
+// 				    source.connect(proc);
+// 				    proc.connect(context.destination);
+// 				    proc.onaudioprocess = function(event) {
+// 				        var audio_data = event.inputBuffer.getChannelData(0) || new Float32Array(2048);
+// 				        console.log("Audio data: " + event.inputBuffer.getChannelData(0));
+// 				        // send audio_data to server
+// 				    }
+				}, function(error) {
+					log("Error", error);
+				});
+			} else {
+				alert('Web Audio API is not supported in your browser');
+			}
+		});
+	</script>
+
+	<video autoplay="autoplay"></video>
+
+</body>
+</html>
