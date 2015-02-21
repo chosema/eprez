@@ -1,4 +1,4 @@
-package sk.tuke.kpi.web;
+package sk.tuke.kpi.web.controllers;
 
 import java.io.FileOutputStream;
 import java.io.IOException;

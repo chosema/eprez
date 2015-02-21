@@ -2,36 +2,24 @@ package sk.tuke.kpi.core.model;
 
 import java.util.Date;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Entity
+@Document
 public class Presentation implements HasId<Long> {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue
 	private Long id;
 	private String name;
-	@Lob
 	private String text;
-	@Temporal(TemporalType.TIMESTAMP)
 	private Date dateCreated;
-	@Temporal(TemporalType.TIMESTAMP)
 	private Date startTime;
 	private int duration;
 	private boolean restricted;
 	private String password;
 	private int views;
 
-	@ManyToOne(optional = false)
-	@JoinColumn
 	private User user;
 
 	public Presentation() { // default constructor

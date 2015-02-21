@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+</h:head>
+
+<h:body>
+
+	<script type="text/javascript">
+		PrimeFaces.widget.CommandButton = PrimeFaces.widget.CommandButton.extend({
+			loading : function() {
+				this.getJQ().addClass('loading');
+				this.disable();
+			},
+			done : function() {
+				this.getJQ().removeClass('loading');
+				this.enable();
+			}
+		});
+	</script>
+
+	<style>
+.loading {
+	background:
+		url('http://www.brown.edu/sites/default/themes/pawtuxet/img/loader-larger.gif');
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position-x: center;
+	color: transparent;
+	text-shadow: 0 1px 1px rgba(255, 255, 255, 0);
+	box-shadow: none;
+	border: 1px solid transparent;
+}
+</style>
+
+	<p:growl autoUpdate="true" showDetail="true" showSummary="true"
+		globalOnly="true" />
+
+	<p:messages for="demo" autoUpdate="true" />
+
+	<h:form id="demoForm">
+
+		<p:panelGrid columns="3">
+			<p:outputLabel for="name" value="Name:" />
+			<p:inputText id="name" value="#{demoController.name}" />
+			<p:message for="name" />
+			<p:outputLabel for="surname" value="Surname:" />
+			<p:inputText id="surname" value="#{demoController.surname}" />
+			<p:message for="surname" />
+		</p:panelGrid>
+
+		<p:commandButton action="#{demoController.onAction}" value="Submit"
+			update="@form" widgetVar="demoBtn" onstart="PF('demoBtn').loading()"
+			oncomplete="PF('demoBtn').done()" />
+
+		<p:panelGrid columns="1">
+			<p:outputLabel value="#{demoController.name}" />
+			<p:outputLabel value="#{demoController.surname}" />
+		</p:panelGrid>
+
+	</h:form>
+
+	<p:messages for="kremo" autoUpdate="true" />
+
+</h:body>
+
+</html>

@@ -2,30 +2,22 @@ package sk.tuke.kpi.core.model;
 
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Entity
-public class User implements HasId<Long> {
+@Document
+public class User implements HasId<String> {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue
-	private Long id;
+	private String id;
 
-	@Column(nullable = false, length = 50)
 	private String login;
-
-	@Column(nullable = false, length = 50)
 	private String firstName;
-
-	@Column(nullable = false, length = 50)
 	private String lastName;
 
-	@OneToMany(mappedBy = "user")
+	@DBRef(lazy = true)
 	private List<Presentation> presentations;
 
 	public User() { // default constructor
@@ -38,11 +30,11 @@ public class User implements HasId<Long> {
 	}
 
 	@Override
-	public Long getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(final Long id) {
+	public void setId(final String id) {
 		this.id = id;
 	}
 
@@ -76,6 +68,11 @@ public class User implements HasId<Long> {
 
 	public void setPresentations(final List<Presentation> presentations) {
 		this.presentations = presentations;
+	}
+
+	@Override
+	public String toString() {
+		return "User [login=" + login + ", " + firstName + " " + lastName + "]";
 	}
 
 }
