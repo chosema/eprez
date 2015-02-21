@@ -1,0 +1,8 @@
+/* PrimeFaces overrides */
+.ui-menubar .ui-menu-list>.ui-menuitem .ui-menuitem-text {
+	margin-right: 10px;
+}
+
+.ui-menubar .ui-button {
+	font-size: 0.8em;
+}
