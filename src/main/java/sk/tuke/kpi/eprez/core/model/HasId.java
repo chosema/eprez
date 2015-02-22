@@ -1,4 +1,4 @@
-package sk.tuke.kpi.core.model;
+package sk.tuke.kpi.eprez.core.model;
 
 import java.io.Serializable;
 

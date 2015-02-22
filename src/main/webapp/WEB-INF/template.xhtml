@@ -1,9 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-	xmlns:h="http://xmlns.jcp.org/jsf/html"
-	xmlns:f="http://xmlns.jcp.org/jsf/core"
-	xmlns:p="http://primefaces.org/ui">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
 
 <h:head>
 	<f:facet name="first">
@@ -22,31 +19,51 @@
 		<h:outputScript library="default" name="js/eprez-main.js" />
 	</f:facet>
 
-	<h:graphicImage id="eprez-background" library="default"
-		name="img/background_blue2.gif" />
+	<!-- <h:graphicImage id="eprez-background" library="default"
+		name="img/background_blue2.gif" />-->
 
-	<p:growl autoUpdate="true" showDetail="true" showSummary="true"
-		globalOnly="true" />
+	<p:growl autoUpdate="true" showDetail="true" showSummary="true" globalOnly="true" />
 
-	<p:menubar>
-		<p:menuitem value="Home" url="#{request.contextPath}"
-			icon="ui-icon-home" />
-		<p:menuitem value="Featured" url="#{request.contextPath}"
-			icon="ui-icon-star" />
-		<p:menuitem value="Archive" url="#{request.contextPath}"
-			icon="ui-icon-suitcase" />
-		<p:menuitem containerStyle="margin-left: 20px;">
-			<p:commandButton value="Create" icon="ui-icon-plusthick" />
-		</p:menuitem>
+	<div style="max-width: 1200px; margin: 0 auto;">
+		<h:form>
+			<p:menubar>
+				<p:menuitem value="Home" url="/" icon="ui-icon-home" />
+				<p:menuitem value="Featured" url="/" icon="ui-icon-star" />
+				<p:menuitem value="Archive" url="/" icon="ui-icon-suitcase" />
+				<p:menuitem containerStyle="margin-left: 20px;">
+					<p:button href="create-presentation.xhtml" value="Create" icon="ui-icon-plusthick" />
+				</p:menuitem>
 
-		<f:facet name="options">
-			<span>peter.chovanec</span>
-			<p:spacer width="20" />
-			<p:commandButton type="button" value="Logout" icon="ui-icon-extlink" />
-		</f:facet>
-	</p:menubar>
+				<f:facet name="options">
+					<h:outputText value="Logged as: #{p:remoteUser()}" rendered="#{p:remoteUser() != null}" />
+					<p:spacer width="20" />
+					<p:button href="/logout" value="Logout" icon="ui-icon-extlink"
+						rendered="#{p:remoteUser() != null}" />
+					<p:outputPanel layout="inline" rendered="#{p:remoteUser() == null}">
+						<p:button href="/login" value="Login" />
+						<span style="vertical-align: middle;"> or <p:commandLink onclick="return PF('signUpDialogWV').show()"
+								value="Sign Up" />
+						</span>
+					</p:outputPanel>
+				</f:facet>
+			</p:menubar>
+		</h:form>
 
-	<ui:insert name="content"></ui:insert>
+		<div id="eprez-content" style="padding-top: 20px;">
+			<p:messages for="globalMessages" autoUpdate="true" closable="true" escape="false" showSummary="true"
+				showDetail="true" />
+			<p:panel>
+				<f:facet name="header">
+					<ui:insert name="title">Home</ui:insert>
+				</f:facet>
+				<ui:insert name="content"></ui:insert>
+			</p:panel>
+		</div>
+	</div>
+
+	<p:outputPanel rendered="#{p:remoteUser() == null}">
+		<ui:include src="/sign-up-dialog.xhtml" />
+	</p:outputPanel>
 
 	<ui:insert name="dialogs"></ui:insert>
 

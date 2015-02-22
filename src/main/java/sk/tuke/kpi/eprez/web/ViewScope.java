@@ -1,4 +1,4 @@
-package sk.tuke.kpi.web;
+package sk.tuke.kpi.eprez.web;
 
 import java.util.Map;
 

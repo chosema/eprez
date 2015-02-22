@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
+
+	<script>
+		jQuery(function() {
+			jQuery("#signUpDialogForm").attr("autocomplete", "off");
+		});
+	</script>
+
+	<p:dialog header="Sign Up" modal="true" resizable="false" draggable="false" dynamic="true" closeOnEscape="true"
+		widgetVar="signUpDialogWV">
+
+		<h:form id="signUpDialogForm">
+
+			<ui:param name="_controller" value="#{signUpController}"></ui:param>
+			<!-- Dummy inputs to obey autocomplete shit in Chrome -->
+			<input type="text" style="display: none;" />
+			<input type="password" style="display: none;" />
+
+			<p:panelGrid columns="2" styleClass="eprez-form" columnClasses=",medium-column">
+				<p:outputLabel for="login" value="Login:" />
+				<p:inputText id="login" value="#{_controller.user.login}" />
+				<p:outputLabel for="firstName" value="First name:" />
+				<p:inputText id="firstName" value="#{_controller.user.firstName}" />
+				<p:outputLabel for="lastName" value="Last name:" />
+				<p:inputText id="lastName" value="#{_controller.user.lastName}" />
+				<p:outputLabel for="email" value="E-mail:" />
+				<p:inputText id="email" value="#{_controller.user.email}" />
+
+				<p:outputLabel for="password" value="Password:" />
+				<p:password id="password" value="#{_controller.user.password}" />
+				<p:outputLabel for="passwordAgain" value="Password again:" />
+				<p:password id="passwordAgain" value="#{_controller.passwordAgain}" required="true" />
+			</p:panelGrid>
+
+			<p:message for="login" />
+			<p:message for="email" />
+			<p:message for="firstName" />
+			<p:message for="lastName" />
+			<p:message for="password" />
+			<p:message for="passwordAgain" />
+			<p:messages for="passwordCheck" />
+
+			<div class="eprez-actions-group">
+				<p:commandButton action="#{_controller.onSign}" value="Sign" />
+				<p:commandLink process="@this" update="@form" value="Cancel" oncomplete="PF('signUpDialogWV').hide()" />
+			</div>
+
+		</h:form>
+
+	</p:dialog>
+
+</ui:composition>

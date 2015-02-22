@@ -1,8 +1,12 @@
-package sk.tuke.kpi.core.model;
+package sk.tuke.kpi.eprez.core.model;
 
 import java.util.List;
+import java.util.Set;
+
+import javax.validation.constraints.NotNull;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -13,9 +17,17 @@ public class User implements HasId<String> {
 	@Id
 	private String id;
 
+	@Indexed(unique = true)
+	@NotNull
 	private String login;
 	private String firstName;
 	private String lastName;
+	@NotNull
+	private String password;
+	@NotNull
+	private String email;
+
+	private Set<String> roles;
 
 	@DBRef(lazy = true)
 	private List<Presentation> presentations;
@@ -27,6 +39,12 @@ public class User implements HasId<String> {
 		this.login = login;
 		this.firstName = firstName;
 		this.lastName = lastName;
+	}
+
+	public User(final String login, final String password, final Set<String> roles) {
+		this.login = login;
+		this.password = password;
+		this.roles = roles;
 	}
 
 	@Override
@@ -60,6 +78,30 @@ public class User implements HasId<String> {
 
 	public void setLastName(final String lastName) {
 		this.lastName = lastName;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(final String password) {
+		this.password = password;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(final String email) {
+		this.email = email;
+	}
+
+	public Set<String> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(final Set<String> roles) {
+		this.roles = roles;
 	}
 
 	public List<Presentation> getPresentations() {

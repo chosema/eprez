@@ -6,3 +6,11 @@
 .ui-menubar .ui-button {
 	font-size: 0.8em;
 }
+
+.ui-outputlabel.ui-state-error {
+	color: red;
+}
+
+.ui-message {
+	margin-bottom: 3px;
+}

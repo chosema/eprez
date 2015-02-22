@@ -1,4 +1,4 @@
-package sk.tuke.kpi.web.controllers;
+package sk.tuke.kpi.eprez.web.controllers;
 
 import java.io.FileOutputStream;
 import java.io.IOException;

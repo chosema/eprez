@@ -1,7 +1,6 @@
-package sk.tuke.kpi;
+package sk.tuke.kpi.eprez;
 
-import javax.annotation.Resource;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,8 +10,8 @@ import org.springframework.core.env.Environment;
 @Configuration
 public class MessageSourceConfig {
 
-	@Resource
-	private Environment env;
+	@Autowired
+	Environment env;
 
 	@Bean
 	public MessageSource messageSource() {

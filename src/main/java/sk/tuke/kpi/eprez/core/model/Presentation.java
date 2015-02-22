@@ -1,46 +1,36 @@
-package sk.tuke.kpi.core.model;
+package sk.tuke.kpi.eprez.core.model;
 
 import java.util.Date;
+
+import javax.validation.constraints.NotNull;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
-public class Presentation implements HasId<Long> {
+public class Presentation extends AbstractAuditable<User, String> {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	private Long id;
+	private String id;
+
+	@NotNull
 	private String name;
-	private String text;
+	private String description;
 	private Date dateCreated;
 	private Date startTime;
 	private int duration;
-	private boolean restricted;
+	@NotNull
+	private RestrictionType restriction;
 	private String password;
 	private int views;
 
-	private User user;
-
-	public Presentation() { // default constructor
-	}
-
-	public Presentation(final String name, final Date dateCreated, final Date startTime, final int duration, final int views, final User user, final String text) {
-		this.name = name;
-		this.dateCreated = dateCreated;
-		this.startTime = startTime;
-		this.duration = duration;
-		this.views = views;
-		this.user = user;
-		this.text = text;
-	}
-
 	@Override
-	public Long getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(final Long id) {
+	public void setId(final String id) {
 		this.id = id;
 	}
 
@@ -52,12 +42,12 @@ public class Presentation implements HasId<Long> {
 		this.name = name;
 	}
 
-	public String getText() {
-		return text;
+	public String getDescription() {
+		return description;
 	}
 
-	public void setText(final String text) {
-		this.text = text;
+	public void setDescription(final String text) {
+		this.description = text;
 	}
 
 	public Date getDateCreated() {
@@ -84,12 +74,12 @@ public class Presentation implements HasId<Long> {
 		this.duration = duration;
 	}
 
-	public boolean isRestricted() {
-		return restricted;
+	public RestrictionType getRestriction() {
+		return restriction;
 	}
 
-	public void setRestricted(final boolean restricted) {
-		this.restricted = restricted;
+	public void setRestriction(final RestrictionType restriction) {
+		this.restriction = restriction;
 	}
 
 	public String getPassword() {
@@ -106,14 +96,6 @@ public class Presentation implements HasId<Long> {
 
 	public void setViews(final int views) {
 		this.views = views;
-	}
-
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(final User user) {
-		this.user = user;
 	}
 
 }

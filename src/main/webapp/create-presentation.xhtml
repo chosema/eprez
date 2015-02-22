@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<ui:composition template="WEB-INF/template.xhtml" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
+
+	<ui:define name="title">New presentation</ui:define>
+
+	<ui:define name="content">
+
+		<script>
+			jQuery(function() {
+				jQuery("#presentationForm").attr("autocomplete", "off");
+			});
+		</script>
+
+		<f:metadata>
+			<f:viewParam name="id" value="#{createPresentationController.id}" />
+			<f:viewAction action="#{createPresentationController.init}" />
+		</f:metadata>
+		<ui:param name="_controller" value="#{createPresentationController}"></ui:param>
+
+		<h:form id="presentationForm">
+
+			<!-- Dummy inputs to obey autocomplete shit in Chrome -->
+			<input type="text" style="display: none;" />
+			<input type="password" style="display: none;" />
+
+			<div class="ui-grid ui-grid-responsive">
+				<div class="ui-grid-row">
+					<div class="ui-grid-col-6">
+						<p:panelGrid columns="2" styleClass="eprez-form" columnClasses=",medium-column">
+							<p:outputLabel for="name" value="Name:" />
+							<p:inputText id="name" value="#{_controller.presentation.name}" required="true" />
+							<p:outputLabel for="description" value="Description:" />
+							<p:inputTextarea id="description" value="#{_controller.presentation.description}" rows="6"
+								style="resize: vertical;" />
+							<p:outputLabel for="restriction" value="Restriction:" />
+							<p:outputPanel>
+								<p:selectOneRadio id="restriction" value="#{_controller.presentation.restriction}" layout="custom"
+									required="true">
+									<p:ajax process="@this" update="opt3Panel" />
+									<f:selectItem itemLabel="Public free" itemValue="#{staticsController.getRestrictionType('PUBLIC')}" />
+									<f:selectItem itemLabel="Only registered" itemValue="#{staticsController.getRestrictionType('REGISTERED')}" />
+									<f:selectItem itemLabel="Password protected" itemValue="#{staticsController.getRestrictionType('PASSWORD')}" />
+								</p:selectOneRadio>
+								<h:panelGrid columns="3" cellpadding="5">
+									<p:radioButton id="opt1" for="restriction" itemIndex="0" />
+									<h:outputLabel for="opt1" value="Public free" />
+									<h:outputText />
+
+									<p:radioButton id="opt2" for="restriction" itemIndex="1" />
+									<h:outputLabel for="opt2" value="Only registered" />
+									<h:outputText />
+									<!-- <p:outputPanel id="opt2Panel">
+							<p:inputText rendered="#{_controller.presentation.restriction == 'REGISTERED'}" />
+						</p:outputPanel> -->
+
+									<p:radioButton id="opt3" for="restriction" itemIndex="2" />
+									<h:outputLabel for="opt3" value="Password protected" />
+									<p:outputPanel id="opt3Panel">
+										<p:password value="#{_controller.presentation.password}" placeholder="Enter password here" autocomplete="off"
+											rendered="#{_controller.presentation.restriction == 'PASSWORD'}" styleClass="eprez-font-small" />
+									</p:outputPanel>
+								</h:panelGrid>
+							</p:outputPanel>
+						</p:panelGrid>
+
+						<p:fileUpload fileUploadListener="#{_controller.onDocumentUpload}" mode="advanced" dragDropSupport="true"
+							label="Choose document" sizeLimit="#{staticsController.documentSizeLimit}"
+							allowTypes="#{staticsController.documentAllowTypes}" styleClass="eprez-font-small" />
+
+						<div style="margin: 20px 0px;">
+							<p:message for="name" />
+							<p:message for="description" />
+							<p:message for="restriction" />
+						</div>
+
+						<p:commandButton action="#{_controller.onSave}" value="Save" update="@form" />
+					</div>
+					<div class="ui-grid-col-6"></div>
+				</div>
+			</div>
+
+		</h:form>
+
+	</ui:define>
+
+</ui:composition>

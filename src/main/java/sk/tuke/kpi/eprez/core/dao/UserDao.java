@@ -1,13 +1,11 @@
-package sk.tuke.kpi.core.dao;
-
-import java.util.List;
+package sk.tuke.kpi.eprez.core.dao;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import sk.tuke.kpi.core.model.User;
+import sk.tuke.kpi.eprez.core.model.User;
 
 public interface UserDao extends MongoRepository<User, String> {
 
-	List<User> findByFirstName(String firstName);
+	User findByLogin(String login);
 
 }

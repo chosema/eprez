@@ -9,3 +9,49 @@ html, body {
 	width: 100%;
 	height: 100%;
 }
+
+#eprez-content {
+	font-size: 0.9em;
+}
+
+.ui-widget.eprez-font-small,.eprez-font-small {
+	font-size: 0.8em;
+}
+
+.ui-widget.eprez-font-medium,.eprez-font-medium {
+	font-size: 0.9em;
+}
+
+.eprez-form {
+	width: 100%;
+}
+
+.eprez-form.ui-panelgrid tr, .eprez-form.ui-panelgrid .ui-panelgrid-cell
+	{
+	border: none;
+}
+
+.eprez-form .ui-inputtextarea, .eprez-form .ui-inputtext {
+	width: 100%;
+}
+
+.eprez-form .big-column {
+	width: 600px;
+}
+
+.eprez-form .medium-column {
+	width: 400px;
+}
+
+.eprez-form .small-column {
+	width: 200px;
+}
+
+.eprez-form .ui-outputlabel {
+	cursor: pointer;
+}
+
+.eprez-actions-group .ui-button,
+.eprez-actions-group .ui-commandlink {
+	margin: 10px 15px 0px 0px;
+}

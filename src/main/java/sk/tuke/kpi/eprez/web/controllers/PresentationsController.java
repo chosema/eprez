@@ -1,20 +1,24 @@
-package sk.tuke.kpi.web.controllers;
+package sk.tuke.kpi.eprez.web.controllers;
+
+import java.io.Serializable;
 
 import javax.annotation.Resource;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Controller;
 
-import sk.tuke.kpi.core.dao.PresentationDao;
-import sk.tuke.kpi.core.model.Presentation;
+import sk.tuke.kpi.eprez.core.dao.PresentationDao;
+import sk.tuke.kpi.eprez.core.model.Presentation;
 
-//@Controller
+@Controller
 @Scope("request")
-public class PresentationsController {
+public class PresentationsController implements Serializable {
+	private static final long serialVersionUID = 1L;
 
 	@Resource
-	private PresentationDao presentationDao;
+	private transient PresentationDao presentationDao;
 
 	private Page<Presentation> presentations;
 
