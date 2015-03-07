@@ -1,13 +1,11 @@
 package sk.tuke.kpi.eprez.core.model;
 
-import java.util.List;
 import java.util.Set;
 
 import javax.validation.constraints.NotNull;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
@@ -28,9 +26,6 @@ public class User implements HasId<String> {
 	private String email;
 
 	private Set<String> roles;
-
-	@DBRef(lazy = true)
-	private List<Presentation> presentations;
 
 	public User() { // default constructor
 	}
@@ -104,17 +99,8 @@ public class User implements HasId<String> {
 		this.roles = roles;
 	}
 
-	public List<Presentation> getPresentations() {
-		return presentations;
-	}
-
-	public void setPresentations(final List<Presentation> presentations) {
-		this.presentations = presentations;
-	}
-
 	@Override
 	public String toString() {
 		return "User [login=" + login + ", " + firstName + " " + lastName + "]";
 	}
-
 }

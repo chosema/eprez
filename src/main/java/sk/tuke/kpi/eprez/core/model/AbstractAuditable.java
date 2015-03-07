@@ -1,58 +1,60 @@
 package sk.tuke.kpi.eprez.core.model;
 
 import java.io.Serializable;
-import java.time.LocalTime;
+import java.util.Date;
 
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 
-public abstract class AbstractAuditable<U, PK extends Serializable> implements HasId<PK> {
+public abstract class AbstractAuditable<PK extends Serializable> implements HasId<PK> {
 	private static final long serialVersionUID = 1L;
 
+	@DBRef
 	@CreatedBy
-	private U createdBy;
+	protected User createdBy;
 
 	@CreatedDate
-	private LocalTime createdDate;
+	protected Date createdDate;
 
+	@DBRef
 	@LastModifiedBy
-	private U lastModifiedBy;
+	protected User lastModifiedBy;
 
 	@LastModifiedDate
-	private LocalTime lastModifiedDate;
+	protected Date lastModifiedDate;
 
-	public U getCreatedBy() {
+	public User getCreatedBy() {
 		return createdBy;
 	}
 
-	public void setCreatedBy(final U createdBy) {
+	public void setCreatedBy(final User createdBy) {
 		this.createdBy = createdBy;
 	}
 
-	public LocalTime getCreatedDate() {
+	public Date getCreatedDate() {
 		return createdDate;
 	}
 
-	public void setCreatedDate(final LocalTime createdDate) {
+	public void setCreatedDate(final Date createdDate) {
 		this.createdDate = createdDate;
 	}
 
-	public U getLastModifiedBy() {
+	public User getLastModifiedBy() {
 		return lastModifiedBy;
 	}
 
-	public void setLastModifiedBy(final U lastModifiedBy) {
+	public void setLastModifiedBy(final User lastModifiedBy) {
 		this.lastModifiedBy = lastModifiedBy;
 	}
 
-	public LocalTime getLastModifiedDate() {
+	public Date getLastModifiedDate() {
 		return lastModifiedDate;
 	}
 
-	public void setLastModifiedDate(final LocalTime lastModifiedDate) {
+	public void setLastModifiedDate(final Date lastModifiedDate) {
 		this.lastModifiedDate = lastModifiedDate;
 	}
-
 }

@@ -8,6 +8,7 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 	</f:facet>
+	<h:outputScript library="default" name="js/eprez-main.js" />
 	<title>ePrez - <ui:insert name="title">Home</ui:insert></title>
 </h:head>
 
@@ -16,11 +17,7 @@
 	<f:facet name="last">
 		<h:outputStylesheet library="default" name="css/primefaces-overrides.css" />
 		<h:outputStylesheet library="default" name="css/eprez-main.css" />
-		<h:outputScript library="default" name="js/eprez-main.js" />
 	</f:facet>
-
-	<!-- <h:graphicImage id="eprez-background" library="default"
-		name="img/background_blue2.gif" />-->
 
 	<p:growl autoUpdate="true" showDetail="true" showSummary="true" globalOnly="true" />
 
@@ -28,20 +25,21 @@
 		<h:form>
 			<p:menubar>
 				<p:menuitem value="Home" url="/" icon="ui-icon-home" />
-				<p:menuitem value="Featured" url="/" icon="ui-icon-star" />
+				<p:menuitem value="Featured" url="/featured.xhtml" icon="ui-icon-star" />
 				<p:menuitem value="Archive" url="/" icon="ui-icon-suitcase" />
 				<p:menuitem containerStyle="margin-left: 20px;">
-					<p:button href="create-presentation.xhtml" value="Create" icon="ui-icon-plusthick" />
+					<p:button href="/login" value="Create" icon="ui-icon-plusthick" rendered="#{p:remoteUser() == null}" />
+					<p:commandButton type="button" value="Create" icon="ui-icon-plusthick" rendered="#{p:remoteUser() != null}"
+						onclick="PF('createPresentationDialogWV').show()" />
 				</p:menuitem>
 
 				<f:facet name="options">
 					<h:outputText value="Logged as: #{p:remoteUser()}" rendered="#{p:remoteUser() != null}" />
 					<p:spacer width="20" />
-					<p:button href="/logout" value="Logout" icon="ui-icon-extlink"
-						rendered="#{p:remoteUser() != null}" />
+					<p:button href="/logout" value="Logout" icon="ui-icon-extlink" rendered="#{p:remoteUser() != null}" />
 					<p:outputPanel layout="inline" rendered="#{p:remoteUser() == null}">
 						<p:button href="/login" value="Login" />
-						<span style="vertical-align: middle;"> or <p:commandLink onclick="return PF('signUpDialogWV').show()"
+						<span style="vertical-align: middle;"> or <p:commandLink onclick="return PF('signUpDialogWV').show();"
 								value="Sign Up" />
 						</span>
 					</p:outputPanel>
@@ -61,9 +59,15 @@
 		</div>
 	</div>
 
+	<!-- Dialogs -->
 	<p:outputPanel rendered="#{p:remoteUser() == null}">
 		<ui:include src="/sign-up-dialog.xhtml" />
 	</p:outputPanel>
+	<ui:include src="/create-presentation-dialog.xhtml" />
+	<p:confirmDialog header="Confirmation" global="true" showEffect="fade" hideEffect="fade">
+        <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+    </p:confirmDialog>
 
 	<ui:insert name="dialogs"></ui:insert>
 

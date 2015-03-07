@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<ui:composition template="WEB-INF/template.xhtml" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
+
+	<ui:define name="title">Presentation</ui:define>
+
+	<ui:define name="content">
+
+		<script>
+			jQuery(function() {
+				jQuery("#presentationForm").attr("autocomplete", "off");
+			});
+		</script>
+
+		<f:metadata>
+			<f:viewParam name="id" value="#{viewPresentationController.id}" />
+			<f:viewAction action="#{viewPresentationController.init}" />
+		</f:metadata>
+
+		<ui:param name="_controller" value="#{viewPresentationController}"></ui:param>
+
+		<h:form id="presentationForm" onsubmit="return false;">
+		
+			<!-- Dummy inputs to obey autocomplete shit in Chrome -->
+			<input type="text" style="display: none;" />
+			<input type="password" style="display: none;" />
+
+			<div class="ui-grid ui-grid-responsive">
+				<div class="ui-grid-row">
+					<div class="ui-grid-col-3" style="min-width: 250px;">
+						<p:graphicImage id="image" url="/image?id=#{_controller.presentation.id}"
+							onclick="PF('imageUploadWV').jq.find('input').click()" styleClass="eprez-presentation-detail-image" />
+						<p:fileUpload fileUploadListener="#{_controller.onImageUpload}" auto="true"
+							sizeLimit="#{staticsController.imageSizeLimit}" allowTypes="#{staticsController.imageAllowTypes}"
+							process="@this" update="image" widgetVar="imageUploadWV" style="display: none;" />
+
+						<p:outputPanel id="publishMessage" layout="block" style="margin-top: 10px;">
+							<p:outputPanel layout="block" class="ui-message ui-message-info ui-widget ui-corner-all" rendered="#{_controller.presentation.published}">
+								<span class="ui-message-info-icon"></span>
+								<span class="ui-message-info-detail">Presentation is published</span>
+							</p:outputPanel>
+							<p:outputPanel layout="block" class="ui-message ui-message-warn ui-widget ui-corner-all" rendered="#{not _controller.presentation.published}">
+								<span class="ui-message-warn-icon"></span>
+								<span class="ui-message-warn-detail">Presentation is not published</span>
+							</p:outputPanel>
+						</p:outputPanel>
+						<p:selectOneButton value="#{_controller.presentation.published}" styleClass="eprez-publish-buttons full-width center">
+							<p:ajax listener="#{_controller.onSave}" process="@this" update="publishMessage" />
+							<f:selectItem itemLabel="Publish" itemValue="true" />
+							<f:selectItem itemLabel="Unpublish" itemValue="false" />
+						</p:selectOneButton>
+
+						<!-- Start time with duration -->
+						<p:inplace editor="true" toggleable="true" styleClass="eprez-inplace">
+							<p:ajax event="save" listener="#{_controller.onSave}" process="@this" />
+							<f:facet name="input">
+								<p:calendar value="#{_controller.presentation.startTime}" pattern="dd.MM.yyyy HH:mm" placeholder="Enter start time..." showOn="button" mask="true"
+									mindate="#{_controller.minDate}" />
+							</f:facet>
+							<f:facet name="output">
+								<h:outputText value="Enter start time..." rendered="#{_controller.presentation.startTime == null}" />
+								<p:outputPanel rendered="#{_controller.presentation.startTime != null}" title="Click to edit..." styleClass="black">
+									<b>Start time: </b>
+									<h:outputText value="#{_controller.presentation.startTime}" >
+										<f:convertDateTime pattern="dd.MM.yyyy HH:mm" />
+									</h:outputText>
+								</p:outputPanel>
+							</f:facet>
+						</p:inplace>
+						<p:inplace editor="true" toggleable="true" styleClass="eprez-inplace">
+							<p:ajax event="save" listener="#{_controller.onSave}" process="@this" />
+							<f:facet name="input">
+								<p:spinner value="#{_controller.presentation.duration}" min="0" />
+							</f:facet>
+							<f:facet name="output">
+								<h:outputText value="Enter duration in minutes..." rendered="#{_controller.presentation.duration == 0}" />
+								<p:outputPanel rendered="#{_controller.presentation.duration > 0}" title="Click to edit..." styleClass="black">
+									<b>Duration: </b>
+									<h:outputText value="#{_controller.presentation.duration} minutes" />
+								</p:outputPanel>
+							</f:facet>
+						</p:inplace>
+						
+						<!-- Restriction and invitations -->
+						<h:panelGrid columns="2" styleClass="full-width">
+							<p:selectOneRadio value="#{_controller.presentation.restriction}" required="true">
+								<p:ajax listener="#{_controller.onSave}" process="@this" update="invitations" />
+								<f:selectItem itemLabel="Public" itemValue="#{staticsController.getRestrictionType('PUBLIC')}" />
+								<f:selectItem itemLabel="Protected" itemValue="#{staticsController.getRestrictionType('PROTECTED')}" />
+							</p:selectOneRadio>
+							<p:outputPanel id="invitations" layout="block">
+								<p:commandButton value="Invitations" styleClass="full-width small" rendered="#{_controller.presentation.restriction == 'PROTECTED'}" />
+							</p:outputPanel>
+						</h:panelGrid>
+					</div>
+					<div class="ui-grid-col-9" style="padding: 5px 20px;">
+						<p:messages for="presentation" autoUpdate="true" showDetail="true" closable="true" />
+						<p:message for="name" />
+						<p:message for="description" />
+						
+						<!-- Categories -->
+						<p:outputPanel id="categoriesPanel">
+							<ul class="ui-autocomplete-multiple-container ui-widget ui-inputfield ui-state-default ui-corner-all no-border" style="display: inline;">
+								<ui:repeat var="category" value="#{_controller.presentation.categories}">
+									<li class="ui-autocomplete-token ui-state-active ui-corner-all">
+										<span class="ui-autocomplete-token-label">#{category.label}</span>
+										<p:commandLink action="#{_controller.onCategoryRemove(category)}" update="@form:categoriesPanel"
+											styleClass="ui-autocomplete-token-icon ui-icon ui-icon-close" />
+									</li>
+								</ui:repeat>
+							</ul>
+						</p:outputPanel>
+						<p:autoComplete placeholder="Categories..." completeMethod="#{_controller.completeCategory}" forceSelection="true" minQueryLength="0"
+							maxResults="100" widgetVar="categoryAutocompleteWV" onclick="PF('categoryAutocompleteWV').search('')">
+							<p:ajax event="itemSelect" listener="#{_controller.onCategorySelect}" update="categoriesPanel"
+								oncomplete="PF('categoryAutocompleteWV').input.val('')" />
+						</p:autoComplete>
+						
+						<!-- Presentation name -->
+						<p:inplace id="nameInplace" editor="true" toggleable="true" styleClass="eprez-inplace big">
+							<p:ajax event="save" listener="#{_controller.onSave}" process="@this" />
+							<f:facet name="input">
+								<p:inputText id="name" value="#{_controller.presentation.name}" />
+							</f:facet>
+							<f:facet name="output">
+								<h:outputText value="Please enter presentation name..." rendered="#{empty _controller.presentation.name}" />
+								<h:outputText value="#{_controller.presentation.name}" rendered="#{not empty _controller.presentation.name}" title="Click to edit..." styleClass="black" />
+							</f:facet>
+						</p:inplace>
+						<!-- Description -->
+						<p:inplace id="descriptionInplace" editor="true" toggleable="true" styleClass="eprez-inplace">
+							<p:ajax event="save" listener="#{_controller.onSave}" process="@this" />
+							<f:facet name="input">
+								<div class="ui-message ui-message-warn ui-widget ui-corner-all">
+									<span class="ui-message-warn-icon"></span>
+									<span class="ui-message-warn-detail">Maximum visible characters of description in overview is 500</span>
+								</div>
+								<p:inputTextarea id="description" value="#{_controller.presentation.description}" rows="10" autoResize="false"
+									style="resize: vertical;" />
+							</f:facet>
+							<f:facet name="output">
+								<h:outputText value="Please enter description..." rendered="#{empty _controller.presentation.description}" />
+								<h:outputText value="#{_controller.presentation.description}"
+									rendered="#{not empty _controller.presentation.description}" title="Click to edit..." styleClass="black"
+									style="white-space: pre-wrap; max-height: 300px; overflow-x: scroll;" />
+							</f:facet>
+						</p:inplace>
+						
+						<!-- Uploaded attachments -->
+						<p:outputPanel id="attachments">
+							<p:dataTable value="#{_controller.presentation.attachments}" var="attachment"
+								rendered="#{not empty _controller.presentation.attachments}" style="margin-top: 25px;">
+								<p:column style="width: 138px;">
+									<!-- <p:inputSwitch value="#{attachment.available}" onLabel="Show" offLabel="Hide" /> -->
+									<p:selectOneButton value="#{attachment.available}" styleClass="small" style="float: left; margin-right: 0px;">
+										<p:ajax listener="#{_controller.onSave(attachment)}" process="@this" update="@namingcontainer" />
+										<f:selectItem itemLabel="Show" itemValue="true" />
+										<f:selectItem itemLabel="Hide" itemValue="false" />
+									</p:selectOneButton>
+									<p:outputPanel rendered="#{attachment.available}" class="ui-icon ui-icon-unlocked" style="float: right;"></p:outputPanel>
+									<p:outputPanel rendered="#{not attachment.available}" class="ui-icon ui-icon-locked" style="float: right;"></p:outputPanel>
+								</p:column>
+								<p:column style="text-overflow: ellipsis;">
+									<p:commandLink value="#{attachment.name}" ajax="false">
+										<p:fileDownload value="#{_controller.getAttachment(attachment)}" />
+									</p:commandLink>
+								</p:column>
+								<p:column width="50px;">
+									<p:commandButton action="#{_controller.onDocumentDelete(attachment)}" process="@this" update="@form:attachments"
+										icon="ui-icon-trash" title="Delete attachment" style="width: 2.2em; height: 1.7em;">
+										<p:confirm header="Deleting attachment" message="Are you sure?" icon="ui-icon-alert" />
+									</p:commandButton>
+								</p:column>
+							</p:dataTable>
+						</p:outputPanel>
+
+						<p:fileUpload fileUploadListener="#{_controller.onDocumentUpload}" mode="advanced" dragDropSupport="true" label="Choose document"
+							sizeLimit="#{staticsController.documentSizeLimit}" allowTypes="#{staticsController.documentAllowTypes}" update="@form:attachments"
+							process="@this" styleClass="eprez-font-small" style="margin-top: 0px;" />
+
+					</div>
+				</div>
+			</div>
+
+		</h:form>
+
+	</ui:define>
+
+</ui:composition>

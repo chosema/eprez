@@ -9,7 +9,7 @@
 	</script>
 
 	<p:dialog header="Sign Up" modal="true" resizable="false" draggable="false" dynamic="true" closeOnEscape="true"
-		widgetVar="signUpDialogWV">
+		width="500" widgetVar="signUpDialogWV">
 
 		<h:form id="signUpDialogForm">
 
@@ -18,7 +18,7 @@
 			<input type="text" style="display: none;" />
 			<input type="password" style="display: none;" />
 
-			<p:panelGrid columns="2" styleClass="eprez-form" columnClasses=",medium-column">
+			<p:panelGrid columns="2" styleClass="no-border" columnClasses=",medium-column">
 				<p:outputLabel for="login" value="Login:" />
 				<p:inputText id="login" value="#{_controller.user.login}" />
 				<p:outputLabel for="firstName" value="First name:" />
@@ -29,7 +29,7 @@
 				<p:inputText id="email" value="#{_controller.user.email}" />
 
 				<p:outputLabel for="password" value="Password:" />
-				<p:password id="password" value="#{_controller.user.password}" />
+				<p:password id="password" value="#{_controller.user.password}" feedback="true" />
 				<p:outputLabel for="passwordAgain" value="Password again:" />
 				<p:password id="passwordAgain" value="#{_controller.passwordAgain}" required="true" />
 			</p:panelGrid>
@@ -43,8 +43,10 @@
 			<p:messages for="passwordCheck" />
 
 			<div class="eprez-actions-group">
-				<p:commandButton action="#{_controller.onSign}" value="Sign" />
-				<p:commandLink process="@this" update="@form" value="Cancel" oncomplete="PF('signUpDialogWV').hide()" />
+				<p:commandButton action="#{_controller.onSign}" update="@form" value="Sign" />
+				<p:commandLink process="@this" update="@form" value="Cancel" oncomplete="PF('signUpDialogWV').hide()">
+					<p:resetInput target="@form" />
+				</p:commandLink>
 			</div>
 
 		</h:form>

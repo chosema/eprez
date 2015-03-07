@@ -31,7 +31,7 @@
 	</context-param>
 	<context-param>
 		<param-name>javax.faces.FACELETS_REFRESH_PERIOD</param-name>
-		<param-value>1</param-value>
+		<param-value>0</param-value>
 	</context-param>
 	<context-param>
 		<param-name>javax.faces.FACELETS_SKIP_COMMENTS</param-name>
@@ -53,8 +53,7 @@
 	</context-param>
 
 	<!-- PRIMEFACES CONFIGURATION PARAMETERS -->
-	<!-- // Transformation of validation rules (Java Bean Validation) to forms, 
-		ie. NotNull, MaxLength,... -->
+	<!-- Transformation of validation rules (Java Bean Validation) to forms, ie. NotNull, MaxLength,... -->
 	<context-param>
 		<param-name>primefaces.TRANSFORM_METADATA</param-name>
 		<param-value>true</param-value>
@@ -69,6 +68,15 @@
 		<param-name>primefaces.THEME</param-name>
 		<param-value>flick</param-value>
 	</context-param>
+
+	<filter>
+		<filter-name>PrimeFaces FileUpload Filter</filter-name>
+		<filter-class>org.primefaces.webapp.filter.FileUploadFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>PrimeFaces FileUpload Filter</filter-name>
+		<servlet-name>FacesServlet</servlet-name>
+	</filter-mapping>
 
 	<servlet>
 		<servlet-name>FacesServlet</servlet-name>

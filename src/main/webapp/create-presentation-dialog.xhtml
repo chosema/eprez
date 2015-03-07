@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
+
+	<p:dialog header="New presentation" modal="true" resizable="false" draggable="false" dynamic="true"
+		closeOnEscape="true" width="500" widgetVar="createPresentationDialogWV">
+
+		<h:form id="createPresentationDialogForm">
+
+			<ui:param name="_controller" value="#{createPresentationController}"></ui:param>
+
+			<p:panelGrid columns="2" styleClass="no-border">
+				<p:outputLabel for="name" value="Name:" />
+				<p:inputText id="name" value="#{_controller.name}" required="true" />
+			</p:panelGrid>
+			<p:message id="messageForName" for="name" />
+			<div class="eprez-actions-group">
+				<p:commandButton action="#{_controller.onCreate}" process="@form" update="@form" value="Create" />
+				<p:commandLink process="@this" update="@form" value="Cancel" oncomplete="PF('createPresentationDialogWV').hide()">
+					<p:resetInput target="@form" />
+				</p:commandLink>
+			</div>
+
+		</h:form>
+
+	</p:dialog>
+
+</ui:composition>

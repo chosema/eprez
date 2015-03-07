@@ -1,29 +1,51 @@
 package sk.tuke.kpi.eprez.core.model;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import sk.tuke.kpi.eprez.core.model.enums.PresentationCategory;
+import sk.tuke.kpi.eprez.core.model.enums.RestrictionType;
+
 @Document
-public class Presentation extends AbstractAuditable<User, String> {
+public class Presentation extends AbstractAuditable<String> {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	private String id;
 
-	@NotNull
+	@NotEmpty
 	private String name;
 	private String description;
-	private Date dateCreated;
 	private Date startTime;
 	private int duration;
+
 	@NotNull
 	private RestrictionType restriction;
-	private String password;
+	private boolean published;
+
 	private int views;
+
+	private byte[] image;
+
+	@DBRef
+	private List<Attachment> attachments;
+	private List<PresentationCategory> categories;
+
+	public Presentation() { // default constructor
+	}
+
+	public Presentation(final String name, final RestrictionType restriction) {
+		this.name = name;
+		this.restriction = restriction;
+	}
 
 	@Override
 	public String getId() {
@@ -50,14 +72,6 @@ public class Presentation extends AbstractAuditable<User, String> {
 		this.description = text;
 	}
 
-	public Date getDateCreated() {
-		return dateCreated;
-	}
-
-	public void setDateCreated(final Date dateCreated) {
-		this.dateCreated = dateCreated;
-	}
-
 	public Date getStartTime() {
 		return startTime;
 	}
@@ -82,12 +96,12 @@ public class Presentation extends AbstractAuditable<User, String> {
 		this.restriction = restriction;
 	}
 
-	public String getPassword() {
-		return password;
+	public boolean isPublished() {
+		return published;
 	}
 
-	public void setPassword(final String password) {
-		this.password = password;
+	public void setPublished(final boolean published) {
+		this.published = published;
 	}
 
 	public int getViews() {
@@ -98,4 +112,33 @@ public class Presentation extends AbstractAuditable<User, String> {
 		this.views = views;
 	}
 
+	public byte[] getImage() {
+		return image == null ? (image = new byte[0]) : image;
+	}
+
+	public void setImage(final byte[] image) {
+		this.image = image;
+	}
+
+	public List<PresentationCategory> getCategories() {
+		return categories == null ? (categories = new ArrayList<>(1)) : categories;
+	}
+
+	public void setCategories(final List<PresentationCategory> categories) {
+		this.categories = categories;
+	}
+
+	public List<Attachment> getAttachments() {
+		return attachments == null ? (attachments = new ArrayList<>(1)) : attachments;
+	}
+
+	public void setAttachments(final List<Attachment> attachments) {
+		this.attachments = attachments;
+	}
+
+	@Override
+	public String toString() {
+		return "Presentation [id=" + id + ", name=" + name + ",\n\tstartTime=" + startTime + ", duration=" + duration + ", restriction=" + restriction + ", published=" + published
+				+ ", views=" + views + ",\n\tattachments=" + attachments + ",\n\tcategories=" + categories + "\n] user=" + (createdBy == null ? lastModifiedBy : createdBy);
+	}
 }

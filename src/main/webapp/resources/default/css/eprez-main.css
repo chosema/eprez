@@ -2,6 +2,14 @@ html, body {
 	height: 100%;
 }
 
+html {
+	background: url('#{resource['default:img/background_blue2.gif']}') no-repeat center center fixed;
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
+	background-size: cover;
+}
+
 #eprez-background {
 	position: fixed;
 	top: 0;
@@ -14,44 +22,156 @@ html, body {
 	font-size: 0.9em;
 }
 
-.ui-widget.eprez-font-small,.eprez-font-small {
+.eprez-presentation-detail-image {
+	width: 100%;
+	max-width: 300px;
+	height: auto;
+	cursor: pointer;
+}
+.eprez-featured-image {
+	max-width: 250px;
+	height: auto;
+}
+
+.eprez-border {
+	border: 1px solid rgb(199, 199, 199);
+	border-radius: 3px;
+}
+.eprez-border:hover {
+	border: 1px solid #0073ea;
+	box-shadow: 0px 0px 5px #0073ea, inset 0 2px 2px #8f8f8f;
+}
+
+.ui-widget.eprez-font-small, .eprez-font-small {
 	font-size: 0.8em;
 }
 
-.ui-widget.eprez-font-medium,.eprez-font-medium {
+.ui-widget.eprez-font-medium, .eprez-font-medium {
 	font-size: 0.9em;
 }
 
-.eprez-form {
+/* Specifics */
+.eprez-publish-buttons.ui-selectonebutton .ui-button {
+	width: 48%;
+}
+
+/* Custom inplace */
+.eprez-inplace {
+	display: block;
+	margin: 10px 0px;
+}
+.eprez-inplace .ui-inplace-display.ui-state-highlight {
+	background: none;
+}
+.eprez-inplace .ui-inplace-display,
+.eprez-inplace .ui-inplace-display span,
+.eprez-inplace .ui-inplace-content,
+.eprez-inplace .ui-inplace-content input,
+.eprez-inplace .ui-inplace-content textarea {
+	-moz-box-sizing: border-box; 
+    -webkit-box-sizing: border-box; 
+     box-sizing: border-box; 
+	display: inline-block;
 	width: 100%;
 }
-
-.eprez-form.ui-panelgrid tr, .eprez-form.ui-panelgrid .ui-panelgrid-cell
-	{
-	border: none;
+.eprez-inplace .ui-inplace-display {
+	border: 1px solid rgb(199, 199, 199) !important;
+	border-radius: 3px;
+	padding: 3px 8px;
+	color: gray;
+}
+.eprez-inplace .ui-inplace-display:hover {
+	box-shadow: 0px 0px 4px #888888;
 }
 
-.eprez-form .ui-inputtextarea, .eprez-form .ui-inputtext {
-	width: 100%;
+/* Custom buttons */
+.ui-button.ui-inplace-save .ui-button-text,
+.ui-button.eprez-btn-success .ui-button-text {
+	background-image: -webkit-linear-gradient(top, #5cb85c 0, #419641 100%);
+	background-image: -o-linear-gradient(top, #5cb85c 0, #419641 100%);
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#5cb85c), to(#419641));
+	background-image: linear-gradient(to bottom, #5cb85c 0, #419641 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff5cb85c', endColorstr='#ff419641', GradientType=0);
+	filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+	background-repeat: repeat-x;
+	border-color: #3e8f3e;
+}
+.ui-button.eprez-btn-danger .ui-button-text {
+	background-image: -webkit-linear-gradient(top, #d9534f 0, #c12e2a 100%);
+	background-image: -o-linear-gradient(top, #d9534f 0, #c12e2a 100%);
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#d9534f), to(#c12e2a));
+	background-image: linear-gradient(to bottom, #d9534f 0, #c12e2a 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffd9534f', endColorstr='#ffc12e2a', GradientType=0);
+	filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+	background-repeat: repeat-x;
+	border-color: #b92c28;
 }
 
-.eprez-form .big-column {
-	width: 600px;
+.ui-button.ui-state-hover.ui-inplace-save,
+.ui-button.ui-state-hover.eprez-btn-success,
+.ui-button.ui-state-hover.eprez-btn-danger {
+	border-color: #3e8f3e !important;
 }
 
-.eprez-form .medium-column {
-	width: 400px;
-}
-
-.eprez-form .small-column {
-	width: 200px;
-}
-
-.eprez-form .ui-outputlabel {
-	cursor: pointer;
-}
-
+/* Helper styles */
 .eprez-actions-group .ui-button,
 .eprez-actions-group .ui-commandlink {
 	margin: 10px 15px 0px 0px;
+}
+
+.no-border  {
+	border: none !important;
+	-moz-box-shadow: none !important;
+	-webkit-box-shadow: none !important;
+	box-shadow: none !important;
+}
+
+.no-border.ui-panelgrid tr,
+.no-border.ui-panelgrid .ui-panelgrid-cell {
+	border: none;
+}
+
+.full-width {
+	width: 100%;
+}
+.top {
+	vertical-align: top;
+}
+.center {
+	text-align: center;
+}
+
+.column-10 {
+	width: 10%;
+}
+.column-20 {
+	width: 20%;
+}
+.column-30 {
+	width: 30%;
+}
+.column-40 {
+	width: 40%;
+}
+.column-50 {
+	width: 50%;
+}
+.column-60 {
+	width: 60%;
+}
+.column-70 {
+	width: 70%;
+}
+.column-80 {
+	width: 80%;
+}
+
+.black {
+	color: black;
+}
+.big {
+	font-size: 1.4em !important;
+}
+.small {
+	font-size: 0.8em !important;
 }

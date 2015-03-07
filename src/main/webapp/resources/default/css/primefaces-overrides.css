@@ -7,10 +7,43 @@
 	font-size: 0.8em;
 }
 
+.ui-radiobutton,
+.ui-outputlabel,
+.ui-chkbox {
+	cursor: pointer;
+}
+
 .ui-outputlabel.ui-state-error {
-	color: red;
+	color: #b94a48;
 }
 
 .ui-message {
 	margin-bottom: 3px;
+}
+
+.ui-password-panel {
+	z-index: 2000 !important;
+}
+
+.ui-autocomplete-panel {
+	max-height: 250px;
+}
+.ui-autocomplete-multiple-container {
+	width: 100%;
+}
+
+.ui-selectonebutton .ui-button.ui-state-active {
+	cursor: default;
+}
+
+.ui-autocomplete-multiple-container.ui-state-disabled .ui-autocomplete-token-icon.ui-icon-close {
+	display: none;
+}
+
+.ui-autocomplete-multiple-container.ui-state-disabled {
+	opacity: 1;
+	filter: Alpha(Opacity = 100);
+	border: none;
+	-webkit-box-shadow: none;
+	box-shadow: none;
 }

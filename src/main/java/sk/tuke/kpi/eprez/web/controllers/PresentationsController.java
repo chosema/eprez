@@ -44,5 +44,4 @@ public class PresentationsController implements Serializable {
 	public void setSize(final int size) {
 		this.size = size;
 	}
-
 }
