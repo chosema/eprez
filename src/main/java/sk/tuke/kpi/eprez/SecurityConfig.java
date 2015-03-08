@@ -39,7 +39,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 
 //	@Configuration
-//	@EnableGlobalMethodSecurity
+//	@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 //	public static class MethodSecurity extends GlobalMethodSecurityConfiguration {
 //	}
 

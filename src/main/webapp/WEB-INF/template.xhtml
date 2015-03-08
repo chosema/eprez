@@ -27,6 +27,7 @@
 				<p:menuitem value="Home" url="/" icon="ui-icon-home" />
 				<p:menuitem value="Featured" url="/featured.xhtml" icon="ui-icon-star" />
 				<p:menuitem value="Archive" url="/" icon="ui-icon-suitcase" />
+				<p:menuitem value="My" url="/featured.xhtml?user" icon="ui-icon-person" rendered="#{p:remoteUser() != null}" />
 				<p:menuitem containerStyle="margin-left: 20px;">
 					<p:button href="/login" value="Create" icon="ui-icon-plusthick" rendered="#{p:remoteUser() == null}" />
 					<p:commandButton type="button" value="Create" icon="ui-icon-plusthick" rendered="#{p:remoteUser() != null}"
@@ -64,10 +65,12 @@
 		<ui:include src="/sign-up-dialog.xhtml" />
 	</p:outputPanel>
 	<ui:include src="/create-presentation-dialog.xhtml" />
-	<p:confirmDialog header="Confirmation" global="true" showEffect="fade" hideEffect="fade">
-        <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
-        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
-    </p:confirmDialog>
+	<h:form>
+		<p:confirmDialog header="Confirmation" global="true" showEffect="fade" hideEffect="fade">
+	        <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+	        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+	    </p:confirmDialog>
+	</h:form>
 
 	<ui:insert name="dialogs"></ui:insert>
 

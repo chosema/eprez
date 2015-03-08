@@ -1,7 +1,6 @@
 package sk.tuke.kpi.eprez.web.controllers;
 
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Predicate;
@@ -40,14 +39,30 @@ public class ViewPresentationController extends AbstractController {
 	String id;
 
 	Presentation presentation;
+	boolean userAuthor;
 
+	@Override
 	public void init() {
+		super.init();
 		presentation = id == null ? new Presentation() : presentationDao.findOne(id);
+		if (presentation == null) {
+			throw new IllegalArgumentException("Presentation with id=" + id + " not found");
+		} else {
+			userAuthor = id == null ? true : presentation.getCreatedBy().equals(getLoggedUser());
+			if (!presentation.isPublished() && !userAuthor) {
+				throw new IllegalArgumentException("Can not access to unpublished presentation");
+			}
+		}
 	}
 
 	public void onSave() {
-		LOGGER.info("Saving presentation:\n" + presentation);
-		presentation = presentationDao.save(presentation);
+		if (presentation.isPublished() && (presentation.getStartTime() == null || presentation.getDuration() == 0)) {
+			presentation.setPublished(false);
+			showErrorMessage("presentation", "To publish presentation you have to set start time and duration");
+		} else {
+			LOGGER.info("Saving presentation:\n" + presentation);
+			presentation = presentationDao.save(presentation);
+		}
 	}
 
 	public void onCategorySelect(final SelectEvent event) {
@@ -64,6 +79,7 @@ public class ViewPresentationController extends AbstractController {
 		if (presentation.getCategories().contains(category)) {
 			showWarnMessage("presentation", "Category '" + category.getLabel() + "' already exists");
 		} else {
+			LOGGER.info("Adding presentation category " + category);
 			presentation.getCategories().add(category);
 			presentation = presentationDao.save(presentation);
 			// showInfoMessage("presentation", "Category '" + category.getLabel() + "' added");
@@ -126,8 +142,8 @@ public class ViewPresentationController extends AbstractController {
 		this.presentation = presentation;
 	}
 
-	public String getImageBase64() {
-		return presentation == null || presentation.getImage().length == 0 ? null : Base64.getEncoder().encodeToString(presentation.getImage());
+	public boolean isUserAuthor() {
+		return userAuthor;
 	}
 
 	public StreamedContent getAttachment(final Attachment attachment) {

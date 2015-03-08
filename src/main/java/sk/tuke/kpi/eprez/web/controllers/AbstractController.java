@@ -6,11 +6,28 @@ import javax.faces.application.FacesMessage;
 import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+
+import sk.tuke.kpi.eprez.core.dao.UserDao;
+import sk.tuke.kpi.eprez.core.model.User;
+
 public abstract class AbstractController implements Serializable {
 	private static final long serialVersionUID = 1L;
 
+	@Autowired
+	UserDao userDao;
+
 	public static final String GLOBAL_MESSAGES = "globalMessages";
 	public static final String GROWL_MESSAGES = null;
+
+	protected User loggedUser;
+
+	public void init() {
+		loggedUser = getLoggedUser();
+	}
 
 	protected void showMessage(final String clientId, final Severity severity, final String summary, final String detail) {
 		final FacesMessage message = new FacesMessage(severity, summary, detail);
@@ -42,4 +59,17 @@ public abstract class AbstractController implements Serializable {
 		return FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath();
 	}
 
+	protected User getLoggedUser() {
+		return userDao.findByLogin(getLoggedUserLogin());
+	}
+
+	protected String getLoggedUserLogin() {
+		final Authentication authentication = getAuthentication();
+		return authentication == null ? null : authentication.getName();
+	}
+
+	private Authentication getAuthentication() {
+		final SecurityContext context = SecurityContextHolder.getContext();
+		return context == null ? null : context.getAuthentication();
+	}
 }

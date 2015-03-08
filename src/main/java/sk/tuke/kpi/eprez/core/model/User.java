@@ -1,5 +1,6 @@
 package sk.tuke.kpi.eprez.core.model;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.validation.constraints.NotNull;
@@ -92,11 +93,41 @@ public class User implements HasId<String> {
 	}
 
 	public Set<String> getRoles() {
-		return roles;
+		return roles == null ? (roles = new HashSet<>(2)) : roles;
 	}
 
 	public void setRoles(final Set<String> roles) {
 		this.roles = roles;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final User other = (User) obj;
+		if (id == null) {
+			if (other.id != null) {
+				return false;
+			}
+		} else if (!id.equals(other.id)) {
+			return false;
+		}
+		return true;
 	}
 
 	@Override

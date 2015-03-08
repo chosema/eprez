@@ -23,12 +23,11 @@ public class DataConfig {
 //		return registration;
 //	}
 
-	/*
-	* Factory bean that creates the com.mongodb.Mongo instance
-	*/
+	// Factory bean that creates the com.mongodb.Mongo instance
 	public @Bean MongoFactoryBean mongo() {
 		final MongoFactoryBean mongo = new MongoFactoryBean();
 		mongo.setHost("localhost");
+		mongo.setPort(27017);
 		return mongo;
 	}
 
@@ -38,7 +37,7 @@ public class DataConfig {
 
 	public @Bean MongoTemplate mongoTemplate() throws Exception {
 		final MongoTemplate template = new MongoTemplate(mongoDbFactory());
-		template.setWriteResultChecking(WriteResultChecking.LOG);
+		template.setWriteResultChecking(WriteResultChecking.EXCEPTION);
 		return template;
 	}
 }

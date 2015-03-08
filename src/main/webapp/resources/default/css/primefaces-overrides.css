@@ -9,7 +9,8 @@
 
 .ui-radiobutton,
 .ui-outputlabel,
-.ui-chkbox {
+.ui-chkbox,
+.ui-selectoneradio label {
 	cursor: pointer;
 }
 

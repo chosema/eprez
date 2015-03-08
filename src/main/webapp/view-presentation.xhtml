@@ -35,7 +35,8 @@
 							sizeLimit="#{staticsController.imageSizeLimit}" allowTypes="#{staticsController.imageAllowTypes}"
 							process="@this" update="image" widgetVar="imageUploadWV" style="display: none;" />
 
-						<p:outputPanel id="publishMessage" layout="block" style="margin-top: 10px;">
+						<p:outputPanel id="publishMessage" layout="block" style="margin-top: 10px;"
+							rendered="#{_controller.userAuthor}">
 							<p:outputPanel layout="block" class="ui-message ui-message-info ui-widget ui-corner-all" rendered="#{_controller.presentation.published}">
 								<span class="ui-message-info-icon"></span>
 								<span class="ui-message-info-detail">Presentation is published</span>
@@ -45,14 +46,15 @@
 								<span class="ui-message-warn-detail">Presentation is not published</span>
 							</p:outputPanel>
 						</p:outputPanel>
-						<p:selectOneButton value="#{_controller.presentation.published}" styleClass="eprez-publish-buttons full-width center">
-							<p:ajax listener="#{_controller.onSave}" process="@this" update="publishMessage" />
+						<p:selectOneButton value="#{_controller.presentation.published}" styleClass="eprez-publish-buttons full-width center"
+							rendered="#{_controller.userAuthor}">
+							<p:ajax listener="#{_controller.onSave}" process="@this" update="@this,publishMessage" />
 							<f:selectItem itemLabel="Publish" itemValue="true" />
 							<f:selectItem itemLabel="Unpublish" itemValue="false" />
 						</p:selectOneButton>
 
 						<!-- Start time with duration -->
-						<p:inplace editor="true" toggleable="true" styleClass="eprez-inplace">
+						<p:inplace editor="true" toggleable="true" styleClass="eprez-inplace" disabled="#{not _controller.userAuthor}">
 							<p:ajax event="save" listener="#{_controller.onSave}" process="@this" />
 							<f:facet name="input">
 								<p:calendar value="#{_controller.presentation.startTime}" pattern="dd.MM.yyyy HH:mm" placeholder="Enter start time..." showOn="button" mask="true"
@@ -68,7 +70,7 @@
 								</p:outputPanel>
 							</f:facet>
 						</p:inplace>
-						<p:inplace editor="true" toggleable="true" styleClass="eprez-inplace">
+						<p:inplace editor="true" toggleable="true" styleClass="eprez-inplace" disabled="#{not _controller.userAuthor}">
 							<p:ajax event="save" listener="#{_controller.onSave}" process="@this" />
 							<f:facet name="input">
 								<p:spinner value="#{_controller.presentation.duration}" min="0" />
@@ -83,7 +85,7 @@
 						</p:inplace>
 						
 						<!-- Restriction and invitations -->
-						<h:panelGrid columns="2" styleClass="full-width">
+						<h:panelGrid columns="2" styleClass="full-width" rendered="#{_controller.userAuthor}">
 							<p:selectOneRadio value="#{_controller.presentation.restriction}" required="true">
 								<p:ajax listener="#{_controller.onSave}" process="@this" update="invitations" />
 								<f:selectItem itemLabel="Public" itemValue="#{staticsController.getRestrictionType('PUBLIC')}" />
@@ -100,25 +102,27 @@
 						<p:message for="description" />
 						
 						<!-- Categories -->
-						<p:outputPanel id="categoriesPanel">
-							<ul class="ui-autocomplete-multiple-container ui-widget ui-inputfield ui-state-default ui-corner-all no-border" style="display: inline;">
-								<ui:repeat var="category" value="#{_controller.presentation.categories}">
-									<li class="ui-autocomplete-token ui-state-active ui-corner-all">
-										<span class="ui-autocomplete-token-label">#{category.label}</span>
-										<p:commandLink action="#{_controller.onCategoryRemove(category)}" update="@form:categoriesPanel"
-											styleClass="ui-autocomplete-token-icon ui-icon ui-icon-close" />
-									</li>
-								</ui:repeat>
-							</ul>
-						</p:outputPanel>
-						<p:autoComplete placeholder="Categories..." completeMethod="#{_controller.completeCategory}" forceSelection="true" minQueryLength="0"
-							maxResults="100" widgetVar="categoryAutocompleteWV" onclick="PF('categoryAutocompleteWV').search('')">
-							<p:ajax event="itemSelect" listener="#{_controller.onCategorySelect}" update="categoriesPanel"
-								oncomplete="PF('categoryAutocompleteWV').input.val('')" />
-						</p:autoComplete>
-						
+						<h:panelGrid columns="2">
+							<p:outputPanel id="categoriesPanel" style="display: inline-block;">
+								<ul class="ui-autocomplete-multiple-container ui-widget ui-inputfield ui-state-default ui-corner-all no-border">
+									<ui:repeat var="category" value="#{_controller.presentation.categories}">
+										<li class="ui-autocomplete-token ui-state-active ui-corner-all">
+											<span class="ui-autocomplete-token-label">#{category.label}</span>
+											<p:commandLink action="#{_controller.onCategoryRemove(category)}" process="@this" update="@form:categoriesPanel"
+												styleClass="ui-autocomplete-token-icon ui-icon ui-icon-close" rendered="#{_controller.userAuthor}" />
+										</li>
+									</ui:repeat>
+								</ul>
+							</p:outputPanel>
+							<p:autoComplete placeholder="Enter categories..." completeMethod="#{_controller.completeCategory}" forceSelection="true" minQueryLength="0"
+								maxResults="100" widgetVar="categoryAutocompleteWV" onclick="PF('categoryAutocompleteWV').search('')" rendered="#{_controller.userAuthor}">
+								<p:ajax event="itemSelect" listener="#{_controller.onCategorySelect}" process="@this" update="categoriesPanel"
+									oncomplete="PF('categoryAutocompleteWV').input.val('')" />
+							</p:autoComplete>
+						</h:panelGrid>
+
 						<!-- Presentation name -->
-						<p:inplace id="nameInplace" editor="true" toggleable="true" styleClass="eprez-inplace big">
+						<p:inplace id="nameInplace" editor="true" toggleable="true" styleClass="eprez-inplace big" disabled="#{not _controller.userAuthor}">
 							<p:ajax event="save" listener="#{_controller.onSave}" process="@this" />
 							<f:facet name="input">
 								<p:inputText id="name" value="#{_controller.presentation.name}" />
@@ -129,7 +133,7 @@
 							</f:facet>
 						</p:inplace>
 						<!-- Description -->
-						<p:inplace id="descriptionInplace" editor="true" toggleable="true" styleClass="eprez-inplace">
+						<p:inplace id="descriptionInplace" editor="true" toggleable="true" styleClass="eprez-inplace" disabled="#{not _controller.userAuthor}">
 							<p:ajax event="save" listener="#{_controller.onSave}" process="@this" />
 							<f:facet name="input">
 								<div class="ui-message ui-message-warn ui-widget ui-corner-all">
@@ -151,7 +155,7 @@
 						<p:outputPanel id="attachments">
 							<p:dataTable value="#{_controller.presentation.attachments}" var="attachment"
 								rendered="#{not empty _controller.presentation.attachments}" style="margin-top: 25px;">
-								<p:column style="width: 138px;">
+								<p:column style="width: 138px;" rendered="#{_controller.userAuthor}">
 									<!-- <p:inputSwitch value="#{attachment.available}" onLabel="Show" offLabel="Hide" /> -->
 									<p:selectOneButton value="#{attachment.available}" styleClass="small" style="float: left; margin-right: 0px;">
 										<p:ajax listener="#{_controller.onSave(attachment)}" process="@this" update="@namingcontainer" />
@@ -161,12 +165,18 @@
 									<p:outputPanel rendered="#{attachment.available}" class="ui-icon ui-icon-unlocked" style="float: right;"></p:outputPanel>
 									<p:outputPanel rendered="#{not attachment.available}" class="ui-icon ui-icon-locked" style="float: right;"></p:outputPanel>
 								</p:column>
-								<p:column style="text-overflow: ellipsis;">
+								<p:column style="width: 80%; text-overflow: ellipsis;">
 									<p:commandLink value="#{attachment.name}" ajax="false">
 										<p:fileDownload value="#{_controller.getAttachment(attachment)}" />
 									</p:commandLink>
 								</p:column>
-								<p:column width="50px;">
+								<p:column style="width: 20%;">
+									<h:outputText value="#{attachment.size > 1024 ? (attachment.size / 1024 / 1024) : (attachment.size / 1024)}">
+										<f:convertNumber maxFractionDigits="2" />
+									</h:outputText>
+									<span>#{attachment.size > 1024 ? 'MB' : 'kB'}</span>
+								</p:column>
+								<p:column width="50px;" rendered="#{_controller.userAuthor}">
 									<p:commandButton action="#{_controller.onDocumentDelete(attachment)}" process="@this" update="@form:attachments"
 										icon="ui-icon-trash" title="Delete attachment" style="width: 2.2em; height: 1.7em;">
 										<p:confirm header="Deleting attachment" message="Are you sure?" icon="ui-icon-alert" />
@@ -177,7 +187,7 @@
 
 						<p:fileUpload fileUploadListener="#{_controller.onDocumentUpload}" mode="advanced" dragDropSupport="true" label="Choose document"
 							sizeLimit="#{staticsController.documentSizeLimit}" allowTypes="#{staticsController.documentAllowTypes}" update="@form:attachments"
-							process="@this" styleClass="eprez-font-small" style="margin-top: 0px;" />
+							process="@this" styleClass="eprez-font-small" style="margin-top: 0px;" rendered="#{_controller.userAuthor}" />
 
 					</div>
 				</div>

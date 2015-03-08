@@ -18,6 +18,11 @@
 			<renderer-type>org.primefaces.component.InplaceRenderer</renderer-type>
 			<renderer-class>sk.tuke.kpi.eprez.web.renderers.EprezInplaceRenderer</renderer-class>
 		</renderer>
+		<renderer>
+			<component-family>org.primefaces.component</component-family>
+			<renderer-type>org.primefaces.component.AutoCompleteRenderer</renderer-type>
+			<renderer-class>sk.tuke.kpi.eprez.web.renderers.EprezAutocompleteRenderer</renderer-class>
+		</renderer>
 	</render-kit>
 
 </faces-config>

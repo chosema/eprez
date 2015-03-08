@@ -31,6 +31,7 @@ html {
 .eprez-featured-image {
 	max-width: 250px;
 	height: auto;
+	max-height: 180px;
 }
 
 .eprez-border {

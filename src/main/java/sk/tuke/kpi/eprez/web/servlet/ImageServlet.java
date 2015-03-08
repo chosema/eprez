@@ -32,7 +32,7 @@ public class ImageServlet extends HttpServlet {
 	public void init(final ServletConfig config) throws ServletException {
 		super.init(config);
 
-		try (final InputStream placeholder1InputStream = getClass().getResourceAsStream("/placeholder2.jpg");
+		try (final InputStream placeholder1InputStream = getClass().getResourceAsStream("/placeholder.png");
 				final InputStream placeholder2InputStream = getClass().getResourceAsStream("/placeholder2.jpg")) {
 			image1Placeholder = IOUtils.toByteArray(placeholder1InputStream);
 			image2Placeholder = IOUtils.toByteArray(placeholder2InputStream);

@@ -27,6 +27,7 @@ public class SignUpController extends AbstractController {
 		}
 
 		user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
+		user.getRoles().add("USER");
 		userDao.save(user);
 
 		final String loginLink = "<a href=\"" + getContextPath() + "/login\">here</a>";

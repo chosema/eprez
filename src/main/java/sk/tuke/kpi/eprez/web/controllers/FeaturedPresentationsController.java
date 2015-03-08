@@ -1,11 +1,17 @@
 package sk.tuke.kpi.eprez.web.controllers;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.primefaces.model.ByteArrayContent;
+import org.apache.commons.lang3.StringUtils;
+import org.primefaces.event.SelectEvent;
+import org.primefaces.event.UnselectEvent;
 import org.primefaces.model.LazyDataModel;
-import org.primefaces.model.StreamedContent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Page;
@@ -22,41 +28,87 @@ import sk.tuke.kpi.eprez.web.data.PageRequest;
 public class FeaturedPresentationsController extends AbstractController {
 	private static final long serialVersionUID = 1L;
 
-	@Autowired
-	PresentationDao presentationDao;
+	private static final Logger LOGGER = LoggerFactory.getLogger(FeaturedPresentationsController.class);
 
-	List<PresentationCategory> categories;
+	@Autowired
+	transient PresentationDao presentationDao;
+
+	private String userParameter;
+	private List<PresentationCategory> categories = new ArrayList<>();
 
 	private final LazyDataModel<Presentation> presentations = new AbstractSpringLazyDataModel<Presentation>() {
 		private static final long serialVersionUID = 1L;
 
 		@Override
 		protected Page<Presentation> getData(final PageRequest pageRequest) {
-			return presentationDao.findAll(convert(pageRequest));
+			if (userParameter == null) {
+				if (getCategories().isEmpty()) {
+					return presentationDao.findByPublished(true, convert(pageRequest));
+				} else {
+					return presentationDao.findByPublishedAndCategories(true, getCategories(), convert(pageRequest));
+				}
+			} else {
+				if (getCategories().isEmpty()) {
+					return presentationDao.findByCreatedBy(loggedUser, convert(pageRequest));
+				} else {
+					return presentationDao.findByCreatedByAndCategories(loggedUser, getCategories(), convert(pageRequest));
+				}
+			}
 		}
 	};
 
-	public void init() {
-
+	public void onCategorySelect(final SelectEvent event) {
+		final PresentationCategory category = getCategory(event.getObject());
+		if (getCategories().contains(category)) {
+			LOGGER.info("Categories filter already contain category " + category);
+		} else {
+			LOGGER.info("Adding category " + category + " to categories filter");
+			getCategories().add(category);
+		}
 	}
 
-	public List<PresentationCategory> getCategories() {
-		return categories;
+	public void onCategoryUnselect(final UnselectEvent event) {
+		final PresentationCategory category = getCategory(event.getObject());
+		LOGGER.info("Removing category " + category + " from categories filter");
+		getCategories().remove(category);
 	}
 
-	public void setCategories(final List<PresentationCategory> categories) {
-		this.categories = categories;
+	private PresentationCategory getCategory(final Object selected) {
+		final PresentationCategory category;
+		if (selected instanceof PresentationCategory) {
+			category = (PresentationCategory) selected;
+		} else if (selected instanceof String) {
+			category = PresentationCategory.valueOfByLabel(String.valueOf(selected));
+		} else {
+			throw new IllegalArgumentException("Unknown selected category: " + selected);
+		}
+		return category;
+	}
+
+	public List<PresentationCategory> completeCategory(final String query) {
+		LOGGER.info("Searching categories with query: " + query);
+		final Predicate<PresentationCategory> availableCategoriesPredicate = category -> !getCategories().contains(category);
+		final Predicate<PresentationCategory> queryPredicate = category -> StringUtils.isEmpty(query) ? true : StringUtils.startsWithIgnoreCase(category.getLabel(), query);
+		return Arrays.stream(PresentationCategory.values()).filter(availableCategoriesPredicate).filter(queryPredicate).collect(Collectors.toList());
 	}
 
 	public LazyDataModel<Presentation> getPresentations() {
 		return presentations;
 	}
 
-	public StreamedContent getImage(final Presentation presentation) {
-		return presentation.getImage().length == 0 ? null : new ByteArrayContent(presentation.getImage());
+	public String getUserParameter() {
+		return userParameter;
 	}
 
-	public boolean hasImage(final Presentation presentation) {
-		return ArrayUtils.isNotEmpty(presentation.getImage());
+	public void setUserParameter(final String userParameter) {
+		this.userParameter = userParameter;
+	}
+
+	public List<PresentationCategory> getCategories() {
+		return categories == null ? (categories = new ArrayList<PresentationCategory>()) : categories;
+	}
+
+	public void setCategories(final List<PresentationCategory> categories) {
+		this.categories = categories;
 	}
 }
