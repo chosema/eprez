@@ -251,7 +251,7 @@ public class ViewPresentationController extends AbstractController {
 		} else if (presentation.getDocument().getState() == DocumentState.PREPARING) {
 			return "Preparing document...";
 		} else if (presentation.getDocument().getState() == DocumentState.SUCCESSFULL) {
-			return "Document has been prepared";
+			return "Document has been prepared from " + presentation.getDocument().getName();
 		} else {
 			return "Document preparing failed";
 		}

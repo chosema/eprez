@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <ui:composition template="WEB-INF/template.xhtml" xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:h="http://xmlns.jcp.org/jsf/html"
-	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
+	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui"
+	xmlns:eprez="http://java.sun.com/jsf/composite/eprez">
 
 	<ui:define name="title">Featured</ui:define>
 
@@ -19,16 +20,20 @@
 				var="category" multiple="true" converter="presentationCategoryConverter" itemLabel="#{category.label}"
 				itemValue="#{category}" completeMethod="#{_controller.completeCategory}" forceSelection="true" minQueryLength="0"
 				maxResults="100" widgetVar="categoryAutocompleteWV">
-				<p:ajax event="itemSelect" listener="#{_controller.onCategorySelect}" process="@this" update=":featuredPresentationsDataForm" />
-				<p:ajax event="itemUnselect" listener="#{_controller.onCategoryUnselect}" process="@this" update=":featuredPresentationsDataForm" />
+				<p:ajax event="itemSelect" listener="#{_controller.onCategorySelect}" process="@this"
+					update=":featuredPresentationsDataForm" />
+				<p:ajax event="itemUnselect" listener="#{_controller.onCategoryUnselect}" process="@this"
+					update=":featuredPresentationsDataForm" />
 				<p:column>
 					<h:outputText value="#{category.label}" />
 				</p:column>
 			</p:autoComplete>
 		</h:form>
 		<h:form id="featuredPresentationsDataForm" style="margin-top: 5px;">
+			<!-- <h:outputText value="No presentations found with given filter criteria" /> -->
 			<p:dataScroller value="#{_controller.presentations}" var="presentation" lazy="true" chunkSize="10">
-				<h:panelGrid columns="2" columnClasses="column-20,column-80 top" styleClass="eprez-border" style="margin: 10px; padding: 10px;">
+				<h:panelGrid columns="2" columnClasses="column-20,column-80 top" styleClass="eprez-border"
+					style="margin: 10px; padding: 10px;">
 					<p:outputPanel layout="block">
 						<img src="#{request.contextPath}/image?id=#{presentation.id}&amp;placeholder=1" class="eprez-featured-image" />
 					</p:outputPanel>
@@ -40,6 +45,30 @@
 							</h:outputLink>
 							<h:outputText value="#{presentation.description == null ? '' : presentation.description.substring(0, 500)}..."
 								styleClass="small" />
+							<p:outputPanel styleClass="small">
+								<ul title="Categories" class="ui-autocomplete-multiple-container ui-widget ui-inputfield ui-state-default ui-corner-all no-border">
+									<ui:repeat var="category" value="#{presentation.categories}">
+										<li class="ui-autocomplete-token ui-state-active ui-corner-all">
+											<span class="ui-autocomplete-token-label">#{category.label}</span>
+										</li>
+									</ui:repeat>
+								</ul>
+							</p:outputPanel>
+							<p:outputPanel styleClass="small" style="color: gray;">
+								<eprez:restriction locked="#{not presentation.restriction.free}" />
+								<h:outputText value="by #{presentation.createdBy.login}" />
+								<span>
+									<h:outputText value=" | starts on " />
+									<h:outputText value="#{presentation.startTime}">
+										<f:convertDateTime pattern="dd.MM.yyyy" />
+									</h:outputText>
+									<h:outputText value=" at " />
+									<h:outputText value="#{presentation.startTime}">
+										<f:convertDateTime pattern="HH:mm" />
+									</h:outputText>
+								</span>
+								<h:outputText value=" | #{presentation.duration} minutes" />
+							</p:outputPanel>
 						</h:panelGrid>
 					</p:outputPanel>
 				</h:panelGrid>
