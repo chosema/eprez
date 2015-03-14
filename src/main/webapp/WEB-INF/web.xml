@@ -63,6 +63,11 @@
 		<param-name>primefaces.UPLOADER</param-name>
 		<param-value>commons</param-value>
 	</context-param>
+	<!-- PartialSubmit -->
+	<context-param>
+		<param-name>primefaces.SUBMIT</param-name>
+		<param-value>partial</param-value>
+	</context-param>
 	<!-- PrimeFaces Theme (use none for no theme) -->
 	<context-param>
 		<param-name>primefaces.THEME</param-name>

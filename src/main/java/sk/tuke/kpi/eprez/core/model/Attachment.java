@@ -2,6 +2,7 @@ package sk.tuke.kpi.eprez.core.model;
 
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
@@ -13,22 +14,19 @@ public class Attachment extends AbstractAuditable<String> {
 
 	@NotEmpty
 	private String name;
-	private byte[] data;
 	private long size;
-
 	private boolean available;
+
+	@DBRef(lazy = true)
+	private Data data;
 
 	public Attachment() { // default constructor
 	}
 
-	public Attachment(final String name, final byte[] data) {
-		this(name, data, data == null ? 0 : data.length);
-	}
-
-	public Attachment(final String name, final byte[] data, final long size) {
+	public Attachment(final String name, final Data data) {
 		this.name = name;
 		this.data = data;
-		this.size = size;
+		this.size = data.getSize();
 	}
 
 	@Override
@@ -48,14 +46,6 @@ public class Attachment extends AbstractAuditable<String> {
 		this.name = name;
 	}
 
-	public byte[] getData() {
-		return data == null ? new byte[0] : data;
-	}
-
-	public void setData(final byte[] data) {
-		this.data = data;
-	}
-
 	public long getSize() {
 		return size;
 	}
@@ -70,6 +60,14 @@ public class Attachment extends AbstractAuditable<String> {
 
 	public void setAvailable(final boolean available) {
 		this.available = available;
+	}
+
+	public Data getData() {
+		return data;
+	}
+
+	public void setData(final Data data) {
+		this.data = data;
 	}
 
 	@Override
@@ -104,6 +102,6 @@ public class Attachment extends AbstractAuditable<String> {
 
 	@Override
 	public String toString() {
-		return "Attachment [id=" + id + ", name=" + name + ", size=" + size + "B, available=" + available + "]";
+		return "Attachment [id=" + id + ", name=" + name + ", available=" + available + "]";
 	}
 }

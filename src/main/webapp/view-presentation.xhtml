@@ -20,7 +20,7 @@
 
 		<ui:param name="_controller" value="#{viewPresentationController}"></ui:param>
 
-		<h:form id="presentationForm" onsubmit="return false;">
+		<h:form id="presentationForm">
 		
 			<!-- Dummy inputs to obey autocomplete shit in Chrome -->
 			<input type="text" style="display: none;" />
@@ -29,65 +29,38 @@
 			<div class="ui-grid ui-grid-responsive">
 				<div class="ui-grid-row">
 					<div class="ui-grid-col-3" style="min-width: 250px;">
-						<p:graphicImage id="image" url="/image?id=#{_controller.presentation.id}"
+						<p:graphicImage id="image" url="/image?id=#{_controller.presentation.id}" title="Click to upload"
 							onclick="PF('imageUploadWV').jq.find('input').click()" styleClass="eprez-presentation-detail-image" />
-						<p:fileUpload fileUploadListener="#{_controller.onImageUpload}" auto="true"
+						<p:fileUpload id="imageUpload" fileUploadListener="#{_controller.onImageUpload}" auto="true" disabled="#{not _controller.userAuthor}"
 							sizeLimit="#{staticsController.imageSizeLimit}" allowTypes="#{staticsController.imageAllowTypes}"
 							process="@this" update="image" widgetVar="imageUploadWV" style="display: none;" />
+						<!-- <p:blockUI block="image" widgetVar="imageBlockWV">
+							<div>LOADING</div>
+							<p:graphicImage library="default" name="img/ajaxloadingbar.gif" />
+						</p:blockUI> -->
 
-						<p:outputPanel id="publishMessage" layout="block" style="margin-top: 10px;"
-							rendered="#{_controller.userAuthor}">
-							<p:outputPanel layout="block" class="ui-message ui-message-info ui-widget ui-corner-all" rendered="#{_controller.presentation.published}">
-								<span class="ui-message-info-icon"></span>
-								<span class="ui-message-info-detail">Presentation is published</span>
-							</p:outputPanel>
-							<p:outputPanel layout="block" class="ui-message ui-message-warn ui-widget ui-corner-all" rendered="#{not _controller.presentation.published}">
-								<span class="ui-message-warn-icon"></span>
-								<span class="ui-message-warn-detail">Presentation is not published</span>
+						<p:outputPanel id="publishMessage" layout="block" style="margin-top: 10px;" rendered="#{_controller.userAuthor}">
+							<ui:param name="publishMessageLocked" value="#{_controller.presentation.restriction == 'PROTECTED'}" />
+							<p:outputPanel layout="block" styleClass="ui-message ui-message-#{_controller.publishMessageClass} ui-widget ui-corner-all">
+								<span class="ui-message-#{_controller.publishMessageClass}-icon" />
+								<span class="ui-message-#{_controller.publishMessageClass}-detail">
+									Presentation is #{_controller.presentation.published ? 'published' : 'not published'}
+									<span class="ui-icon ui-icon-#{publishMessageLocked ? 'locked' : 'unlocked'}"
+										title="#{publishMessageLocked ? 'Protected access by invitations' : 'Free access'}" />
+								</span>
 							</p:outputPanel>
 						</p:outputPanel>
 						<p:selectOneButton value="#{_controller.presentation.published}" styleClass="eprez-publish-buttons full-width center"
 							rendered="#{_controller.userAuthor}">
-							<p:ajax listener="#{_controller.onSave}" process="@this" update="@this,publishMessage" />
+							<p:ajax listener="#{_controller.onSave}" process="@this" update="publishMessage" />
 							<f:selectItem itemLabel="Publish" itemValue="true" />
 							<f:selectItem itemLabel="Unpublish" itemValue="false" />
 						</p:selectOneButton>
 
-						<!-- Start time with duration -->
-						<p:inplace editor="true" toggleable="true" styleClass="eprez-inplace" disabled="#{not _controller.userAuthor}">
-							<p:ajax event="save" listener="#{_controller.onSave}" process="@this" />
-							<f:facet name="input">
-								<p:calendar value="#{_controller.presentation.startTime}" pattern="dd.MM.yyyy HH:mm" placeholder="Enter start time..." showOn="button" mask="true"
-									mindate="#{_controller.minDate}" />
-							</f:facet>
-							<f:facet name="output">
-								<h:outputText value="Enter start time..." rendered="#{_controller.presentation.startTime == null}" />
-								<p:outputPanel rendered="#{_controller.presentation.startTime != null}" title="Click to edit..." styleClass="black">
-									<b>Start time: </b>
-									<h:outputText value="#{_controller.presentation.startTime}" >
-										<f:convertDateTime pattern="dd.MM.yyyy HH:mm" />
-									</h:outputText>
-								</p:outputPanel>
-							</f:facet>
-						</p:inplace>
-						<p:inplace editor="true" toggleable="true" styleClass="eprez-inplace" disabled="#{not _controller.userAuthor}">
-							<p:ajax event="save" listener="#{_controller.onSave}" process="@this" />
-							<f:facet name="input">
-								<p:spinner value="#{_controller.presentation.duration}" min="0" />
-							</f:facet>
-							<f:facet name="output">
-								<h:outputText value="Enter duration in minutes..." rendered="#{_controller.presentation.duration == 0}" />
-								<p:outputPanel rendered="#{_controller.presentation.duration > 0}" title="Click to edit..." styleClass="black">
-									<b>Duration: </b>
-									<h:outputText value="#{_controller.presentation.duration} minutes" />
-								</p:outputPanel>
-							</f:facet>
-						</p:inplace>
-						
 						<!-- Restriction and invitations -->
 						<h:panelGrid columns="2" styleClass="full-width" rendered="#{_controller.userAuthor}">
 							<p:selectOneRadio value="#{_controller.presentation.restriction}" required="true">
-								<p:ajax listener="#{_controller.onSave}" process="@this" update="invitations" />
+								<p:ajax listener="#{_controller.onSave}" process="@this" update="publishMessage,invitations" />
 								<f:selectItem itemLabel="Public" itemValue="#{staticsController.getRestrictionType('PUBLIC')}" />
 								<f:selectItem itemLabel="Protected" itemValue="#{staticsController.getRestrictionType('PROTECTED')}" />
 							</p:selectOneRadio>
@@ -95,12 +68,35 @@
 								<p:commandButton value="Invitations" styleClass="full-width small" rendered="#{_controller.presentation.restriction == 'PROTECTED'}" />
 							</p:outputPanel>
 						</h:panelGrid>
+						
+						<p:outputPanel id="presentationDocumentState" style="margin-top: 30px;" rendered="#{_controller.userAuthor}">
+							<p:outputPanel layout="block" styleClass="ui-message ui-message-#{_controller.documentStateMessageClass} ui-widget ui-corner-all">
+								<span class="ui-message-#{_controller.documentStateMessageClass}-icon" />
+								<span class="ui-message-#{_controller.documentStateMessageClass}-detail">
+									<h:outputText value="#{_controller.documentStateMessage}" />
+								</span>
+							</p:outputPanel>
+							<h:graphicImage library="default" name="img/ajaxloadingbar.gif" rendered="#{_controller.documentPreparing}" style="width: 100%;" />
+						</p:outputPanel>
+						
+						<!-- Buttons for preview and launch -->
+						<p:outputPanel id="launchButtons" rendered="#{_controller.userAuthor}">
+							<p:commandButton value="Open preview" disabled="#{not _controller.documentPrepared}" styleClass="full-width" />
+							<p:commandButton value="Launch" disabled="#{not _controller.documentPrepared}" icon="ui-icon-circle-triangle-e"
+								styleClass="full-width" style="margin-top: 10px;">
+								<p:confirm header="Launching presentation" message="Are you sure you want to start presentation?" icon="ui-icon-alert" />
+							</p:commandButton>
+						</p:outputPanel>
 					</div>
 					<div class="ui-grid-col-9" style="padding: 5px 20px;">
 						<p:messages for="presentation" autoUpdate="true" showDetail="true" closable="true" />
-						<p:message for="name" />
-						<p:message for="description" />
-						
+						<p:outputPanel id="validationMessages">
+							<p:message for="name" />
+							<p:message for="description" />
+							<p:message for="startTime" />
+							<p:message for="duration" />
+						</p:outputPanel>
+
 						<!-- Categories -->
 						<h:panelGrid columns="2">
 							<p:outputPanel id="categoriesPanel" style="display: inline-block;">
@@ -123,15 +119,59 @@
 
 						<!-- Presentation name -->
 						<p:inplace id="nameInplace" editor="true" toggleable="true" styleClass="eprez-inplace big" disabled="#{not _controller.userAuthor}">
-							<p:ajax event="save" listener="#{_controller.onSave}" process="@this" />
+							<p:ajax event="save" listener="#{_controller.onSave}" process="@this" update="validationMessages" />
 							<f:facet name="input">
-								<p:inputText id="name" value="#{_controller.presentation.name}" />
+								<p:inputText id="name" label="Presentation name" value="#{_controller.presentation.name}" required="true" />
 							</f:facet>
 							<f:facet name="output">
 								<h:outputText value="Please enter presentation name..." rendered="#{empty _controller.presentation.name}" />
 								<h:outputText value="#{_controller.presentation.name}" rendered="#{not empty _controller.presentation.name}" title="Click to edit..." styleClass="black" />
 							</f:facet>
 						</p:inplace>
+						
+						<!-- Start time with duration -->
+						<div class="ui-grid ui-grid-responsive">
+							<div class="ui-grid-row">
+								<div class="ui-grid-col-7" style="margin-right: 5px;">
+									<p:inplace editor="true" toggleable="true" styleClass="eprez-inplace" disabled="#{not _controller.userAuthor}">
+										<p:ajax event="save" listener="#{_controller.onSave}" process="@this" update="validationMessages" />
+										<f:facet name="input">
+											<p:calendar id="startTime" label="Presentation start time" value="#{_controller.presentation.startTime}"
+												pattern="dd.MM.yyyy HH:mm" placeholder="Enter start time..." showOn="button" mask="true"
+												mindate="#{_controller.minDate}" required="true" />
+										</f:facet>
+										<f:facet name="output">
+											<h:outputText value="Enter start time..." rendered="#{_controller.presentation.startTime == null}" />
+											<p:outputPanel rendered="#{_controller.presentation.startTime != null}" title="Click to edit..."
+												styleClass="black">
+												<b>Start time: </b>
+												<h:outputText value="#{_controller.presentation.startTime}">
+													<f:convertDateTime pattern="dd.MM.yyyy HH:mm" />
+												</h:outputText>
+											</p:outputPanel>
+										</f:facet>
+									</p:inplace>
+								</div>
+								<div class="ui-grid-col-6">
+									<p:inplace editor="true" toggleable="true" styleClass="eprez-inplace" disabled="#{not _controller.userAuthor}">
+										<p:ajax event="save" listener="#{_controller.onSave}" process="@this" update="validationMessages" />
+										<f:facet name="input">
+											<p:spinner id="duration" label="Presentation duration" value="#{_controller.presentation.duration}" min="0"
+												required="true" />
+										</f:facet>
+										<f:facet name="output">
+											<h:outputText value="Enter duration in minutes..." rendered="#{_controller.presentation.duration == 0}" />
+											<p:outputPanel rendered="#{_controller.presentation.duration > 0}" title="Click to edit..."
+												styleClass="black">
+												<b>Duration: </b>
+												<h:outputText value="#{_controller.presentation.duration} minutes" />
+											</p:outputPanel>
+										</f:facet>
+									</p:inplace>
+								</div>
+							</div>
+						</div>
+
 						<!-- Description -->
 						<p:inplace id="descriptionInplace" editor="true" toggleable="true" styleClass="eprez-inplace" disabled="#{not _controller.userAuthor}">
 							<p:ajax event="save" listener="#{_controller.onSave}" process="@this" />
@@ -150,7 +190,7 @@
 									style="white-space: pre-wrap; max-height: 300px; overflow-x: scroll;" />
 							</f:facet>
 						</p:inplace>
-						
+
 						<!-- Uploaded attachments -->
 						<p:outputPanel id="attachments">
 							<p:dataTable value="#{_controller.presentation.attachments}" var="attachment"
@@ -162,11 +202,12 @@
 										<f:selectItem itemLabel="Show" itemValue="true" />
 										<f:selectItem itemLabel="Hide" itemValue="false" />
 									</p:selectOneButton>
-									<p:outputPanel rendered="#{attachment.available}" class="ui-icon ui-icon-unlocked" style="float: right;"></p:outputPanel>
-									<p:outputPanel rendered="#{not attachment.available}" class="ui-icon ui-icon-locked" style="float: right;"></p:outputPanel>
+									<h:outputText title="Attachment is visible to other users" rendered="#{attachment.available}"
+										class="ui-icon ui-icon-unlocked" style="float: right;" />
+									<h:outputText title="Attachment is hidden to other users" rendered="#{not attachment.available}" class="ui-icon ui-icon-locked" style="float: right;" />
 								</p:column>
 								<p:column style="width: 80%; text-overflow: ellipsis;">
-									<p:commandLink value="#{attachment.name}" ajax="false">
+									<p:commandLink value="#{attachment.name}" ajax="false" process="@this">
 										<p:fileDownload value="#{_controller.getAttachment(attachment)}" />
 									</p:commandLink>
 								</p:column>
@@ -176,13 +217,22 @@
 									</h:outputText>
 									<span>#{attachment.size > 1024 ? 'MB' : 'kB'}</span>
 								</p:column>
-								<p:column width="50px;" rendered="#{_controller.userAuthor}">
+								<p:column width="80px;" rendered="#{_controller.userAuthor}">
 									<p:commandButton action="#{_controller.onDocumentDelete(attachment)}" process="@this" update="@form:attachments"
 										icon="ui-icon-trash" title="Delete attachment" style="width: 2.2em; height: 1.7em;">
 										<p:confirm header="Deleting attachment" message="Are you sure?" icon="ui-icon-alert" />
 									</p:commandButton>
+									<p:commandButton action="#{_controller.onDocumentPrepare(attachment)}" process="@this"
+										update="@form:attachments,@form:presentationDocumentState,@form:launchButtons" icon="ui-icon-video"
+										title="Prepare this document for presentation" disabled="#{not attachment.name.endsWith('.pdf')}"
+										oncomplete="PF('pollDocumentWV').start()" style="width: 2.2em; height: 1.7em;">
+										<p:confirm header="Prepare document for presentation"
+											message="Are you sure? Previous prepared document will be overwritten." icon="ui-icon-alert" />
+									</p:commandButton>
 								</p:column>
 							</p:dataTable>
+							<p:poll interval="2" listener="#{_controller.onPollDocument}" process="@this" autoStart="false"
+								ignoreAutoUpdate="true" widgetVar="pollDocumentWV" />
 						</p:outputPanel>
 
 						<p:fileUpload fileUploadListener="#{_controller.onDocumentUpload}" mode="advanced" dragDropSupport="true" label="Choose document"

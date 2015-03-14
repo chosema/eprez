@@ -29,6 +29,11 @@ public class Application {
 	@PostConstruct
 	public void init() {
 		LOGGER.info("Application starting with profiles: " + Arrays.asList(env.getActiveProfiles()));
+
+//		SLF4JBridgeHandler.install();
+//		LoggerFactory.getLogger(Application.class).info("Test message from SLF4J");
+//		org.apache.log4j.Logger.getLogger(Application.class).info("Test message from LOG4J");
+//		java.util.logging.Logger.getLogger(Application.class.getName()).info("Test message from JUL");
 	}
 
 }

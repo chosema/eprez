@@ -35,6 +35,7 @@ public class Presentation extends AbstractAuditable<String> {
 
 	private byte[] image;
 
+	private PresentationDocument document;
 	@DBRef
 	private List<Attachment> attachments;
 	private List<PresentationCategory> categories;
@@ -126,6 +127,14 @@ public class Presentation extends AbstractAuditable<String> {
 
 	public void setCategories(final List<PresentationCategory> categories) {
 		this.categories = categories;
+	}
+
+	public PresentationDocument getDocument() {
+		return document;
+	}
+
+	public void setDocument(final PresentationDocument document) {
+		this.document = document;
 	}
 
 	public List<Attachment> getAttachments() {

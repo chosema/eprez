@@ -13,6 +13,8 @@
 
 	<logger name="sk.tuke.kpi.eprez" level="DEBUG" />
 
+	<logger name="com.mongodb" level="DEBUG" />
+
 	<root level="info">
 		<appender-ref ref="STDOUT" />
 	</root>
