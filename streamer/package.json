@@ -1,0 +1,23 @@
+{
+  "name": "eprez-streamer",
+  "version": "0.0.1",
+  "description": "Streaming part of Eprez project, responsible for online presentations streaming",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "run-client": "watchify -t debowerify  client\\main.js -o WebContent/js/eprez.js",
+    "run-server": "node server\\main.js"
+  },
+  "author": "Peter Chovanec",
+  "license": "ISC",
+  "dependencies": {
+    "binaryjs": "^0.2.1",
+    "express": "^4.12.2",
+    "mongodb": "^1.4.34",
+    "mongojs": "^0.18.2",
+    "winston": "^0.9.0"
+  },
+  "devDependencies": {
+    "debowerify": "^1.2.0"
+  }
+}

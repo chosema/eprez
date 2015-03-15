@@ -1,0 +1,12 @@
+html, body {
+	height: 100%;
+}
+
+/* Carousel normalization */
+.carousel-indicators li {
+	border-color: #6B6B6B;
+}
+
+.carousel-indicators .active {
+	background-color: #6B6B6B;
+}
