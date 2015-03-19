@@ -1,0 +1,33 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'io.spring.gradle:dependency-management-plugin:0.3.0.RELEASE'
+    }
+}
+
+apply plugin: 'io.spring.dependency-management'
+
+repositories {
+     maven { url "http://repository.primefaces.org" }
+}
+
+dependencyManagement {
+    imports {
+        mavenBom 'io.spring.platform:platform-bom:1.1.1.RELEASE'
+    }
+}
+
+dependencies {
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-mongodb'
+    compile group: 'org.hibernate', name: 'hibernate-validator'
+    compile group: 'commons-io', name: 'commons-io'
+    compile group: 'org.apache.commons', name: 'commons-lang3'
+    compile group: 'commons-collections', name: 'commons-collections'
+    compile group: 'org.apache.pdfbox', name: 'pdfbox', version:'1.8.8'
+
+    testCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-test') {
+		exclude(module: 'commons-logging')
+    }
+}

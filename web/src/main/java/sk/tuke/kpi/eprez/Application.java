@@ -8,21 +8,15 @@ import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
 
 @Configuration
 @ComponentScan
+@Import({ CoreConfig.class })
 public class Application {
-
-	@Configuration
-	@PropertySource(value = { "classpath:/application.properties" })
-	public static class ApplicationPropertiesConfig {
-	}
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
 
@@ -44,7 +38,4 @@ public class Application {
 //		java.util.logging.Logger.getLogger(Application.class.getName()).info("Test message from JUL");
 	}
 
-	public static @Bean PropertySourcesPlaceholderConfigurer propertyPlaceholderConfigurer() {
-		return new PropertySourcesPlaceholderConfigurer();
-	}
 }

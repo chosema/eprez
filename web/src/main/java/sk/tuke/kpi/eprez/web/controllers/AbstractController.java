@@ -1,5 +1,6 @@
 package sk.tuke.kpi.eprez.web.controllers;
 
+import java.io.IOException;
 import java.io.Serializable;
 
 import javax.faces.application.FacesMessage;
@@ -65,6 +66,10 @@ public abstract class AbstractController implements Serializable {
 	protected String facesRedirect(final String outcome) {
 		flashMessages();
 		return outcome + (outcome.endsWith(".xhtml") ? "?" : "&") + "faces-redirect=true";
+	}
+
+	protected void sendRedirect(final String url) throws IOException {
+		FacesContext.getCurrentInstance().getExternalContext().redirect(url);
 	}
 
 	public String getContextPath() {

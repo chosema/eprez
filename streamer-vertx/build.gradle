@@ -1,0 +1,12 @@
+dependencies {
+
+	compile 'io.vertx:vertx-platform:2.1.5'
+
+	compile 'gnu.getopt:java-getopt:1.0.13'
+
+	compile 'commons-io:commons-io:2.4'
+
+	compile 'commons-httpclient:commons-httpclient:3.1'
+
+	compile 'ch.qos.logback:logback-classic:1.1.2'
+}

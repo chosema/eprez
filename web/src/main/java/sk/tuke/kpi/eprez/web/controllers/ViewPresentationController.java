@@ -1,10 +1,12 @@
 package sk.tuke.kpi.eprez.web.controllers;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Predicate;
@@ -28,11 +30,12 @@ import sk.tuke.kpi.eprez.core.dao.AttachmentDao;
 import sk.tuke.kpi.eprez.core.dao.DataDao;
 import sk.tuke.kpi.eprez.core.dao.DocumentPageDao;
 import sk.tuke.kpi.eprez.core.dao.PresentationDao;
+import sk.tuke.kpi.eprez.core.dao.SessionTokenDao;
 import sk.tuke.kpi.eprez.core.model.Attachment;
 import sk.tuke.kpi.eprez.core.model.Data;
 import sk.tuke.kpi.eprez.core.model.DocumentPage;
 import sk.tuke.kpi.eprez.core.model.Presentation;
-import sk.tuke.kpi.eprez.core.model.PresentationDocument;
+import sk.tuke.kpi.eprez.core.model.SessionToken;
 import sk.tuke.kpi.eprez.core.model.enums.DocumentState;
 import sk.tuke.kpi.eprez.core.model.enums.PresentationCategory;
 import sk.tuke.kpi.eprez.docs.DocumentProcessor;
@@ -53,6 +56,8 @@ public class ViewPresentationController extends AbstractController {
 	@Autowired
 	transient DocumentPageDao documentPageDao;
 	@Autowired
+	transient SessionTokenDao sessionTokenDao;
+	@Autowired
 	transient TaskExecutor taskExecutor;
 
 	String id;
@@ -72,7 +77,7 @@ public class ViewPresentationController extends AbstractController {
 			userAuthor = id == null ? true : presentation.getCreatedBy().equals(getLoggedUser());
 			if (!userAuthor) {
 				if (presentation.isPublished()) {
-					presentation.setAttachments(presentation.getAttachments().stream().filter(att -> att.isAvailable()).collect(Collectors.<Attachment>toList()));
+					presentation.setAttachments(presentation.getAttachments().stream().filter(att -> att.isAvailable()).collect(Collectors.toList()));
 				} else {
 					throw new IllegalArgumentException("Can not access to unpublished presentation");
 				}
@@ -153,7 +158,7 @@ public class ViewPresentationController extends AbstractController {
 
 		LOGGER.info("Preparing new document from attachment: " + attachment.getName());
 
-		final PresentationDocument document = new PresentationDocument(attachment.getName());
+		final Presentation.Document document = new Presentation.Document(attachment.getName());
 		presentation.setDocument(document);
 		presentation = presentationDao.save(presentation);
 		lastDocumentState = document.getState();
@@ -187,7 +192,7 @@ public class ViewPresentationController extends AbstractController {
 
 	public void onPollDocument() {
 		if (presentation != null && presentation.getId() != null) {
-			final PresentationDocument document = presentationDao.findOne(presentation.getId()).getDocument();
+			final Presentation.Document document = presentationDao.findOne(presentation.getId()).getDocument();
 			presentation.setDocument(document);
 
 			LOGGER.debug("Polling " + document);
@@ -227,7 +232,7 @@ public class ViewPresentationController extends AbstractController {
 		}
 	}
 
-	private void stopDocumentPolling(final PresentationDocument document) {
+	private void stopDocumentPolling(final Presentation.Document document) {
 		if (document.getState() == DocumentState.FAILED || document.getState() == DocumentState.SUCCESSFULL) {
 			LOGGER.debug("Sending stop on polling for " + document);
 			RequestContext.getCurrentInstance().execute("PF('pollDocumentWV').stop()");
@@ -275,7 +280,69 @@ public class ViewPresentationController extends AbstractController {
 	}
 
 	public boolean isPresentationRunning() {
-		return presentation.getInstance() != null && presentation.getInstance().isRunning();
+		return presentation.getSession() != null && presentation.getSession().isRunning();
+	}
+
+	public void onLaunch() {
+		final Presentation.Session session = new Presentation.Session();
+		session.setRunning(true);
+		session.setCurrentPageIndex(0);
+		session.setTokens(Arrays.asList(sessionTokenDao.save(new SessionToken(true, getLoggedUser()))));
+
+		presentation.setSession(session);
+		presentation = presentationDao.save(presentation);
+
+		sendOpenStream(session.getTokens().get(0));
+	}
+
+	public void onContinue() {
+		final SessionToken userToken = findLoggedUserToken();
+		if (userToken != null && userToken.isPresenter()) {
+			sendOpenStream(userToken);
+		} else {
+			LOGGER.error("Can not continue on presentation session because of invalid " + userToken);
+		}
+	}
+
+	public void onStop() {
+		presentation.getSession().setRunning(false);
+		presentation.getSession().setTokens(Collections.emptyList());
+		presentation = presentationDao.save(presentation);
+		showInfoMessage(null, "Presentation session stopped successfully");
+	}
+
+	public void onOpen() throws IOException {
+		if (loggedUser == null) {
+			showWarnMessage(null, "To open presentation session you have to log in");
+			return;
+		}
+
+		presentation = presentationDao.findOne(presentation.getId());
+		if (presentation.getSession() != null && presentation.getSession().isRunning()) {
+			// TODO check restriction, optimize token searching
+			SessionToken token = findLoggedUserToken();
+			if (token == null) {
+				token = sessionTokenDao.save(new SessionToken(loggedUser));
+				presentation.getSession().getTokens().add(token);
+				presentation = presentationDao.save(presentation);
+				LOGGER.info("Opening presentation session by " + loggedUser + " with new token: " + token.getId());
+			} else {
+				LOGGER.info("Opening presentation session by " + loggedUser + " with already generated token: " + token.getId());
+			}
+
+			sendOpenStream(token);
+		} else {
+			showWarnMessage(null, "Presentation session does not started yet");
+		}
+	}
+
+	private SessionToken findLoggedUserToken() {
+		final List<SessionToken> tokens = presentation.getSession().getTokens().stream().filter(token -> loggedUser.equals(token.getUser())).collect(Collectors.toList());
+		return tokens.isEmpty() ? null : tokens.get(0);
+	}
+
+	private void sendOpenStream(final SessionToken token) {
+		RequestContext.getCurrentInstance().execute("window.open('" + getContextPath() + "/streamer/#?token=" + token.getId() + "')");
 	}
 
 	public String getId() {

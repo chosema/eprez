@@ -87,14 +87,16 @@
 						<p:outputPanel id="launchButtons" rendered="#{_controller.userAuthor}">
 							<p:commandButton value="Open preview" disabled="#{not _controller.documentPrepared}" process="@this"
 								styleClass="full-width"	style="margin-bottom: 15px;" />
-							<p:commandButton value="Launch" disabled="#{not _controller.documentPrepared}" rendered="#{not _controller.presentationRunning}"
+							<p:commandButton value="Launch" action="#{_controller.onLaunch}" disabled="#{not _controller.documentPrepared}" rendered="#{not _controller.presentationRunning}"
 								process="@this" update="launchButtons" icon="ui-icon-circle-triangle-e" styleClass="full-width">
 								<p:confirm header="Launching presentation" message="Are you sure you want to start presentation?"
 									icon="ui-icon-alert" />
 							</p:commandButton>
 							
-							<p:commandButton value="Continue" rendered="#{_controller.presentationRunning}" icon="ui-icon-play" styleClass="full-width" />
-							<p:commandButton value="Stop" rendered="#{_controller.presentationRunning}" icon="ui-icon-stop" styleClass="full-width" />
+							<p:commandButton value="Continue" action="#{_controller.onContinue}" process="@this" rendered="#{_controller.presentationRunning}"
+								icon="ui-icon-play" styleClass="full-width" />
+							<p:commandButton value="Stop" action="#{_controller.onStop}" process="@this" update="launchButtons" rendered="#{_controller.presentationRunning}"
+								icon="ui-icon-stop" styleClass="full-width" />
 						</p:outputPanel>
 						<p:outputPanel rendered="#{not _controller.userAuthor}" style="margin-top: 30px;">
 							<script>
@@ -117,8 +119,8 @@
 							<div id="remainingTimePanel" class="small" style="display: none; color: gray;">
 								<span>Remaining time to start: </span><span id="remainingTime"></span>
 							</div>
-							<p:commandButton value="Open" disabled="#{not _controller.presentationRunning}" icon="ui-icon-circle-triangle-e"
-								styleClass="full-width" />
+							<p:commandButton value="Open" action="#{_controller.onOpen}" process="@this" disabled="#{not _controller.presentationRunning}"
+								icon="ui-icon-circle-triangle-e" styleClass="full-width" />
 						</p:outputPanel>
 					</div>
 					<div class="ui-grid-col-9" style="padding: 5px 20px;">
@@ -221,9 +223,9 @@
 							</f:facet>
 							<f:facet name="output">
 								<h:outputText value="Please enter description..." rendered="#{empty _controller.presentation.description}" />
-								<h:outputText value="#{_controller.presentation.description}"
-									rendered="#{not empty _controller.presentation.description}" title="Click to edit..." styleClass="black"
-									style="white-space: pre-wrap; max-height: 300px; overflow-x: scroll;" />
+								<h:outputText value="#{_controller.presentation.description}" title="Click to edit..."
+									rendered="#{not empty _controller.presentation.description}" styleClass="black"
+									style="display: inline-block; white-space: pre-wrap; max-height: 300px; overflow-y: scroll;" />
 							</f:facet>
 						</p:inplace>
 

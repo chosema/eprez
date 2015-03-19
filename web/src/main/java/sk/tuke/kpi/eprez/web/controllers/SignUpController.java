@@ -32,7 +32,7 @@ public class SignUpController extends AbstractController {
 
 		final String loginLink = "<a href=\"" + getContextPath() + "/login\">here</a>";
 		showInfoMessage(GLOBAL_MESSAGES, "You have been sucessfully registered. You can login " + loginLink + " now.");
-		return facesRedirect("index.xhtml");
+		return facesRedirect("overview.xhtml");
 	}
 
 	public User getUser() {

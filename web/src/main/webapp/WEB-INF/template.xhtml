@@ -24,10 +24,9 @@
 	<div style="max-width: 1200px; margin: 0 auto;">
 		<h:form>
 			<p:menubar>
-				<p:menuitem value="Home" url="/" icon="ui-icon-home" />
-				<p:menuitem value="Featured" url="/featured.xhtml" icon="ui-icon-star" />
+				<p:menuitem value="Overview" url="/" icon="ui-icon-home" />
 				<p:menuitem value="Archive" url="/" icon="ui-icon-suitcase" />
-				<p:menuitem value="My" url="/featured.xhtml?user" icon="ui-icon-person" rendered="#{p:remoteUser() != null}" />
+				<p:menuitem value="My" url="/overview.xhtml?user" icon="ui-icon-person" rendered="#{p:remoteUser() != null}" />
 				<p:menuitem containerStyle="margin-left: 20px;">
 					<p:button href="/login" value="Create" icon="ui-icon-plusthick" rendered="#{p:remoteUser() == null}" />
 					<p:commandButton type="button" value="Create" icon="ui-icon-plusthick" rendered="#{p:remoteUser() != null}"

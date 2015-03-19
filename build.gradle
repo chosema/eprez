@@ -1,0 +1,33 @@
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'eclipse-wtp'
+    apply plugin: 'maven'
+
+	group = 'sk.tuke.kpi.eprez'
+	version = '0.0.1'
+
+	sourceCompatibility = 1.8
+	targetCompatibility = 1.8
+
+    repositories {
+		mavenCentral()
+		maven {
+			url "http://repository.primefaces.org"
+		}
+    }
+
+    configurations {
+		provided
+	}
+
+	sourceSets {
+		main { compileClasspath += configurations.provided }
+	}
+
+    eclipse.classpath.plusConfigurations += [configurations.provided]
+
+    jar {
+        manifest.attributes provider: 'Peter Chovanec'
+    }
+
+}
