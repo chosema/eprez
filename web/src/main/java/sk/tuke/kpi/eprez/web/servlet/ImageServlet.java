@@ -48,10 +48,10 @@ public class ImageServlet extends HttpServlet {
 		final Presentation presentation = presentationDao.findOne(id);
 
 		final byte[] imageData;
-		if (presentation == null || presentation.getImage().length == 0) {
+		if (presentation == null || presentation.getImage() == null) {
 			imageData = "1".equals(req.getParameter("placeholder")) ? image1Placeholder : image2Placeholder;
 		} else {
-			imageData = presentation.getImage();
+			imageData = presentation.getImage().getContent();
 		}
 		resp.setContentLength(imageData.length);
 		IOUtils.write(imageData, resp.getOutputStream());

@@ -74,7 +74,7 @@ module.exports = [ '$scope', 'webSocketService', function($scope, webSocketServi
 		$scope.input.disconnect();
 		$scope.node.disconnect();
 		$scope.input = $scope.node = null;
-		
+
 		if (scopeApply) {
 			$scope.$apply();
 		}

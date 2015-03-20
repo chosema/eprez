@@ -7,6 +7,9 @@ import java.util.Map;
 
 import org.primefaces.model.LazyDataModel;
 
+import sk.tuke.kpi.eprez.core.criteria.LoadCriteria;
+import sk.tuke.kpi.eprez.core.criteria.Pagination;
+
 public abstract class AbstractLazyDataModel<T> extends LazyDataModel<T> implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -19,11 +22,11 @@ public abstract class AbstractLazyDataModel<T> extends LazyDataModel<T> implemen
 
 		setRowCount((int) getCount());
 		if (getRowCount() > 0) {
-			sk.tuke.kpi.eprez.web.data.SortOrder order = null;
+			sk.tuke.kpi.eprez.core.criteria.SortOrder order = null;
 			if (sortOrder == org.primefaces.model.SortOrder.ASCENDING) {
-				order = sk.tuke.kpi.eprez.web.data.SortOrder.ASC;
+				order = sk.tuke.kpi.eprez.core.criteria.SortOrder.ASC;
 			} else if (sortOrder == org.primefaces.model.SortOrder.DESCENDING) {
-				order = sk.tuke.kpi.eprez.web.data.SortOrder.DESC;
+				order = sk.tuke.kpi.eprez.core.criteria.SortOrder.DESC;
 			}
 
 			final List<T> data = getData(new LoadCriteria(new Pagination(first, pageSize), order, sortField));

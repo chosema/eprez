@@ -98,7 +98,7 @@ module.exports = [ '$scope', 'webSocketService', function($scope, webSocketServi
 		$scope.input.disconnect();
 		$scope.node.disconnect();
 		$scope.input = $scope.node = null;
-		
+
 		if (scopeApply) {
 			$scope.$apply();
 		}
@@ -131,10 +131,19 @@ module.exports = angular.module('eprezApp.services', [])
 },{"./dataService":"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\services\\dataService.js","./webSocketService":"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\services\\webSocketService.js"}],"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\services\\dataService.js":[function(require,module,exports){
 module.exports = [ '$resource', '$location', '$q', function($resource, $location, $q) {
 	
-	return {
+	var contextPath = '/web/streamer';
+	var dataResource = $resource("/");
+	
+	var dataService = {
 		path: $location.path(),
-		token : $location.path().substring(1, $location.path().length)
+		token : $location.path().substring(1, $location.path().length),
+		
+		info: function() {
+			dataService.token;
+		}
 	}
+
+	return dataService;
 }]
 
 },{}],"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\services\\webSocketService.js":[function(require,module,exports){
@@ -192,14 +201,13 @@ module.exports = [ '$q', 'dataService', function($q, dataService) {
 	}
 
 	return {
-		send: function(event, data) {
+		send: function(message, data) {
 			if (ws) {
-				ws.send(data);
-//				if (data === undefined) {
-//					ws.send(joinUint8Arrays(new Uint8Array([0]), event));
-//				} else {
-//					ws.send(joinUint8Arrays(strToUint8Array(event), new Uint8Array([0]), data));
-//				}
+				if (data === undefined) {
+					ws.send(joinUint8Arrays(strToUint8Array(message), new Uint8Array([0])));
+				} else {
+					ws.send(joinUint8Arrays(strToUint8Array(message), new Uint8Array([0]), data));
+				}
 				return true;
 			}
 			return false;

@@ -1,4 +1,4 @@
-package sk.tuke.kpi.eprez.docs;
+package sk.tuke.kpi.eprez.core.docs;
 
 import java.awt.image.BufferedImage;
 

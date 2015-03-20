@@ -1,7 +1,6 @@
-package sk.tuke.kpi.eprez.streamer.helpers;
+package sk.tuke.kpi.eprez.streamer.pumps;
 
 import org.vertx.java.core.streams.ReadStream;
-import org.vertx.java.core.streams.WriteStream;
 
 public class MulticastStreamPump extends AbstractMulticastPump {
 
@@ -33,8 +32,8 @@ public class MulticastStreamPump extends AbstractMulticastPump {
 	@Override
 	public MulticastStreamPump stop() {
 		readStream.dataHandler(null);
-		for (final WriteStream<?> writeStream : writeStreams) {
-			writeStream.drainHandler(null);
+		for (final Listener listener : listeners) {
+			listener.getWriteStream().drainHandler(null);
 		}
 		return this;
 	}

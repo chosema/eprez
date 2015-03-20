@@ -19,6 +19,10 @@ public class Data implements Serializable {
 	public Data() { // default constructor
 	}
 
+	public Data(final byte[] content, final String contentType) {
+		this(content, contentType, content.length);
+	}
+
 	public Data(final byte[] content, final String contentType, final long size) {
 		this.content = content;
 		this.contentType = contentType;
@@ -34,7 +38,7 @@ public class Data implements Serializable {
 	}
 
 	public byte[] getContent() {
-		return content;
+		return content == null ? (content = new byte[0]) : content;
 	}
 
 	public void setContent(final byte[] content) {

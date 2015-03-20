@@ -1,10 +1,8 @@
-package sk.tuke.kpi.eprez;
+package sk.tuke.kpi.eprez.web;
 
 import org.springframework.beans.factory.config.CustomScopeConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import sk.tuke.kpi.eprez.web.ViewScope;
 
 @Configuration
 public class ScopesConfig {

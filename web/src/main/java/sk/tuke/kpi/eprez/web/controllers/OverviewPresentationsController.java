@@ -17,11 +17,11 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 
+import sk.tuke.kpi.eprez.core.criteria.PageRequest;
 import sk.tuke.kpi.eprez.core.dao.PresentationDao;
 import sk.tuke.kpi.eprez.core.model.Presentation;
 import sk.tuke.kpi.eprez.core.model.enums.PresentationCategory;
 import sk.tuke.kpi.eprez.web.data.AbstractSpringLazyDataModel;
-import sk.tuke.kpi.eprez.web.data.PageRequest;
 
 @Controller
 @Scope("view")

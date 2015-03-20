@@ -1,4 +1,4 @@
-package sk.tuke.kpi.eprez;
+package sk.tuke.kpi.eprez.web;
 
 import javax.annotation.Resource;
 

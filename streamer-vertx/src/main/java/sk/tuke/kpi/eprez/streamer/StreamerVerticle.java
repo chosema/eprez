@@ -9,10 +9,11 @@ import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.http.RouteMatcher;
 import org.vertx.java.platform.Verticle;
 
-import sk.tuke.kpi.eprez.streamer.handlers.PlaybackHandler;
-import sk.tuke.kpi.eprez.streamer.handlers.RecordHandler;
+import sk.tuke.kpi.eprez.streamer.handlers.PlaybackRequestHandler;
+import sk.tuke.kpi.eprez.streamer.handlers.PresenterWebSocketHandler;
 import sk.tuke.kpi.eprez.streamer.handlers.WebSocketHandlerDispatcher;
-import sk.tuke.kpi.eprez.streamer.helpers.AbstractMulticastPump;
+import sk.tuke.kpi.eprez.streamer.helpers.JsonHelper;
+import sk.tuke.kpi.eprez.streamer.pumps.AbstractMulticastPump;
 
 public class StreamerVerticle extends Verticle {
 
@@ -32,18 +33,20 @@ public class StreamerVerticle extends Verticle {
 
 		final HttpServer httpServer = vertx.createHttpServer();
 
-		//@formatter:off --- Playback handler
+		//@formatter:off
 		httpServer.requestHandler(new RouteMatcher()
 			.noMatch(req -> LOGGER.error("Received HTTP request with no routing: " + req.path()))
 			.get("/index.html", req -> req.response().sendFile("C:\\Users\\pchov_000\\Desktop\\index.html"))
-			.get("/play/:token", new PlaybackHandler(vertx, multicastBus)));
+			.get("/play/:token", new PlaybackRequestHandler(vertx, multicastBus))
+			.get("/info/:token", req -> SharedData.presentation().findBySessionToken(req.params().get("token"), JsonHelper.documentsWriter(req.response()))));
 		//@formatter:on
 
-		//@formatter:off --- WS recording handler
+		//@formatter:off
 		httpServer.websocketHandler(new WebSocketHandlerDispatcher()
-			.on("/record/:token", new RecordHandler(vertx, multicastBus)));
+			.on("/record/:token", new PresenterWebSocketHandler(vertx, multicastBus)));
 		//@formatter:on
 
 		httpServer.listen(port);
 	}
+
 }

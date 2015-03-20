@@ -1,4 +1,4 @@
-package sk.tuke.kpi.eprez;
+package sk.tuke.kpi.eprez.core;
 
 import java.util.concurrent.Executor;
 

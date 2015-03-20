@@ -9,6 +9,10 @@ import java.util.Map;
 import org.primefaces.model.LazyDataModel;
 import org.springframework.data.domain.Page;
 
+import sk.tuke.kpi.eprez.core.criteria.PageRequest;
+import sk.tuke.kpi.eprez.core.criteria.Sort;
+import sk.tuke.kpi.eprez.core.criteria.SortOrder;
+
 public abstract class AbstractSpringLazyDataModel<T> extends LazyDataModel<T> implements Serializable {
 	private static final long serialVersionUID = 1L;
 

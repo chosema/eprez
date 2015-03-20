@@ -9,8 +9,8 @@ import java.io.InputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
-import sk.tuke.kpi.eprez.docs.DocumentProcessor;
-import sk.tuke.kpi.eprez.docs.PageProcessedCallback;
+import sk.tuke.kpi.eprez.core.docs.DocumentProcessor;
+import sk.tuke.kpi.eprez.core.docs.PageProcessedCallback;
 
 public class DocumentProcessorTest {
 

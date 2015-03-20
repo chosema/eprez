@@ -6,7 +6,7 @@
 
 	<welcome-file-list>
 		<welcome-file>overview.xhtml</welcome-file>
-		<welcome-file>index.html</welcome-file>
+		<welcome-file>index.jsp</welcome-file>
 	</welcome-file-list>
 
 	<!-- SPRING CONTEXT LOADING CONFIGURATION (JAVA config) -->
@@ -22,7 +22,7 @@
 	</context-param>
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
-		<param-value>sk.tuke.kpi.eprez.Application</param-value>
+		<param-value>sk.tuke.kpi.eprez.web.Application</param-value>
 	</context-param>
 
 	<!-- JSF CONFIGURATION PARAMETERS -->

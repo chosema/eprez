@@ -1,4 +1,4 @@
-package sk.tuke.kpi.eprez.web.data;
+package sk.tuke.kpi.eprez.core.criteria;
 
 import java.io.Serializable;
 

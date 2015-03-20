@@ -1,4 +1,4 @@
-package sk.tuke.kpi.eprez;
+package sk.tuke.kpi.eprez.web;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -12,6 +12,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
+
+import sk.tuke.kpi.eprez.core.CoreConfig;
 
 @Configuration
 @ComponentScan

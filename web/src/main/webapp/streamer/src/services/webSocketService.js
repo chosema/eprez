@@ -52,14 +52,13 @@ module.exports = [ '$q', 'dataService', function($q, dataService) {
 	}
 
 	return {
-		send: function(event, data) {
+		send: function(message, data) {
 			if (ws) {
-				ws.send(data);
-//				if (data === undefined) {
-//					ws.send(joinUint8Arrays(new Uint8Array([0]), event));
-//				} else {
-//					ws.send(joinUint8Arrays(strToUint8Array(event), new Uint8Array([0]), data));
-//				}
+				if (data === undefined) {
+					ws.send(joinUint8Arrays(strToUint8Array(message), new Uint8Array([0])));
+				} else {
+					ws.send(joinUint8Arrays(strToUint8Array(message), new Uint8Array([0]), data));
+				}
 				return true;
 			}
 			return false;

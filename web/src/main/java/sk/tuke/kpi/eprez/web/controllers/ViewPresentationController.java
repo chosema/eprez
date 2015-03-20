@@ -30,6 +30,7 @@ import sk.tuke.kpi.eprez.core.dao.DataDao;
 import sk.tuke.kpi.eprez.core.dao.DocumentPageDao;
 import sk.tuke.kpi.eprez.core.dao.PresentationDao;
 import sk.tuke.kpi.eprez.core.dao.SessionTokenDao;
+import sk.tuke.kpi.eprez.core.docs.DocumentProcessor;
 import sk.tuke.kpi.eprez.core.model.Attachment;
 import sk.tuke.kpi.eprez.core.model.Data;
 import sk.tuke.kpi.eprez.core.model.DocumentPage;
@@ -37,7 +38,6 @@ import sk.tuke.kpi.eprez.core.model.Presentation;
 import sk.tuke.kpi.eprez.core.model.SessionToken;
 import sk.tuke.kpi.eprez.core.model.enums.DocumentState;
 import sk.tuke.kpi.eprez.core.model.enums.PresentationCategory;
-import sk.tuke.kpi.eprez.docs.DocumentProcessor;
 
 @Controller
 @Scope("view")
@@ -126,7 +126,7 @@ public class ViewPresentationController extends AbstractController {
 	}
 
 	public void onImageUpload(final FileUploadEvent event) {
-		presentation.setImage(event.getFile().getContents());
+		presentation.setImage(dataDao.save(new Data(event.getFile().getContents(), event.getFile().getContentType())));
 		presentation = presentationDao.save(presentation);
 	}
 

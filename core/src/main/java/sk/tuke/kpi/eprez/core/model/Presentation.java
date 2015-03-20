@@ -129,13 +129,13 @@ public class Presentation extends AbstractAuditable<String> {
 
 	private int views;
 
-	private byte[] image;
-
 	private Document document;
 	private Session session;
 	private List<PresentationCategory> categories;
 	@DBRef
 	private List<Attachment> attachments;
+	@DBRef(lazy = true)
+	private Data image;
 
 	public Presentation() { // default constructor
 	}
@@ -210,11 +210,11 @@ public class Presentation extends AbstractAuditable<String> {
 		this.views = views;
 	}
 
-	public byte[] getImage() {
-		return image == null ? (image = new byte[0]) : image;
+	public Data getImage() {
+		return image;
 	}
 
-	public void setImage(final byte[] image) {
+	public void setImage(final Data image) {
 		this.image = image;
 	}
 

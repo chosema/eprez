@@ -1,4 +1,4 @@
-package sk.tuke.kpi.eprez.streamer.helpers;
+package sk.tuke.kpi.eprez.streamer.pumps;
 
 import sk.tuke.kpi.eprez.streamer.handlers.WebSocketMessageHandler;
 
