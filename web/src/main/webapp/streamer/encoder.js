@@ -6,7 +6,7 @@ self.onmessage = function(e) {
 	switch (e.data.cmd) {
 	case 'init':
 		if (!e.data.config) {
-			e.data.config = { };
+			e.data.config = {};
 		}
 		mp3codec = Lame.init();
 		Lame.set_mode(mp3codec, e.data.config.mode || Lame.JOINT_STEREO);
@@ -17,11 +17,17 @@ self.onmessage = function(e) {
 		break;
 	case 'encode':
 		var mp3data = Lame.encode_buffer_ieee_float(mp3codec, e.data.buf, e.data.buf);
-		self.postMessage({cmd: 'data', buf: mp3data.data});
+		self.postMessage({
+		    cmd : 'data',
+		    buf : mp3data.data
+		});
 		break;
 	case 'finish':
 		var mp3data = Lame.encode_flush(mp3codec);
-		self.postMessage({cmd: 'end', buf: mp3data.data});
+		self.postMessage({
+		    cmd : 'end',
+		    buf : mp3data.data
+		});
 		Lame.close(mp3codec);
 		mp3codec = null;
 		break;

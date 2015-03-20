@@ -12,7 +12,7 @@ import org.vertx.java.platform.Verticle;
 import sk.tuke.kpi.eprez.streamer.handlers.PlaybackHandler;
 import sk.tuke.kpi.eprez.streamer.handlers.RecordHandler;
 import sk.tuke.kpi.eprez.streamer.handlers.WebSocketHandlerDispatcher;
-import sk.tuke.kpi.eprez.streamer.helpers.MulticastPump;
+import sk.tuke.kpi.eprez.streamer.helpers.AbstractMulticastPump;
 
 public class StreamerVerticle extends Verticle {
 
@@ -20,7 +20,7 @@ public class StreamerVerticle extends Verticle {
 
 	private final int port;
 
-	private final Map<String, MulticastPump> multicastBus = new HashMap<String, MulticastPump>();
+	private final Map<String, AbstractMulticastPump> multicastBus = new HashMap<String, AbstractMulticastPump>();
 
 	public StreamerVerticle(final int port) {
 		this.port = port;
@@ -32,21 +32,17 @@ public class StreamerVerticle extends Verticle {
 
 		final HttpServer httpServer = vertx.createHttpServer();
 
-		// Playback handler
-		//@formatter:off
-		final RouteMatcher httpRouteMatcher = new RouteMatcher()
+		//@formatter:off --- Playback handler
+		httpServer.requestHandler(new RouteMatcher()
 			.noMatch(req -> LOGGER.error("Received HTTP request with no routing: " + req.path()))
 			.get("/index.html", req -> req.response().sendFile("C:\\Users\\pchov_000\\Desktop\\index.html"))
-			.get("/play/:token", new PlaybackHandler(vertx, multicastBus));
-		httpServer.requestHandler(httpRouteMatcher);
+			.get("/play/:token", new PlaybackHandler(vertx, multicastBus)));
 		//@formatter:on
 
-		// WS recording handler
-		//@formatter:off
-		final WebSocketHandlerDispatcher webSocketDispatcher = new WebSocketHandlerDispatcher()
-			.on("/record/:token", new RecordHandler(vertx, multicastBus));
+		//@formatter:off --- WS recording handler
+		httpServer.websocketHandler(new WebSocketHandlerDispatcher()
+			.on("/record/:token", new RecordHandler(vertx, multicastBus)));
 		//@formatter:on
-		httpServer.websocketHandler(webSocketDispatcher);
 
 		httpServer.listen(port);
 	}

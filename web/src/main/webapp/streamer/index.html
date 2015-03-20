@@ -9,6 +9,8 @@
 <!-- Bootstrap -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+<!-- Font Awesome Icons -->
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
 
 <link href="eprez.css" rel="stylesheet">
 
@@ -19,25 +21,22 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
 </head>
-<body>
+<body ng-controller="bodyController">
 
-	<div class="container well" ng-controller="recorderController">
-		<div class="row">
-			<label>Sample Rate: <select class="form-control" ng-model="samplerate" ng-options="s + ' Hz' for s in samplerates"></select></label>
-			<label>Bit Rate: <select class="form-control" ng-model="bitrate" ng-options="b + ' kbps' for b in bitrates"></select></label>
+	<nav class="navbar navbar-default navbar-fixed-top" style="max-width: 1100px; margin: 0 auto;">
+		<div class="container" ng-controller="recorderController">
+			<label>Sample Rate: <select class="form-control" ng-model="samplerate"
+				ng-options="s + ' Hz' for s in samplerates"></select></label> <label>Bit Rate: <select class="form-control"
+				ng-model="bitrate" ng-options="b + ' kbps' for b in bitrates"></select></label>
 			<button class="btn btn-default" ng-click="startRecording()" ng-disabled="recording">
-				<span class="glyphicon glyphicon-play-circle" aria-hidden="true"></span> Start recording
+				<i class="fa fa-play" style="color: green;"></i> Start presentation
 			</button>
 			<button class="btn btn-default" ng-click="stopRecording()" ng-disabled="!recording">
-				<span class="glyphicon glyphicon-stop" style="color: red;" aria-hidden="true"></span> Stop recording
+				<i class="fa fa-stop" style="color: red;"></i> Stop presentation
 			</button>
+			<span ng-show="recording">Recording...</span>
 		</div>
-		<div class="row">
-			<div class="span12 text-center" ng-show="recording">
-				<span class="label label-important">Recording...</span>
-			</div>
-		</div>
-	</div>
+	</nav>
 
 	<div id="document-carousel" class="carousel slide" style="height: 100%;" ng-controller="documentCarouselController">
 		<!-- Indicators -->
@@ -50,15 +49,15 @@
 		<!-- Wrapper for slides -->
 		<div class="carousel-inner" role="listbox">
 			<div class="item active">
-				<img src="..." alt="...">
+				<img src="" alt="...">
 				<div class="carousel-caption">...</div>
 			</div>
 			<div class="item">
-				<img src="..." alt="...">
+				<img src="" alt="...">
 				<div class="carousel-caption">...</div>
 			</div>
 			<div class="item">
-				<img src="..." alt="...">
+				<img src="" alt="...">
 				<div class="carousel-caption">...</div>
 			</div>
 		</div>

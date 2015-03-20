@@ -2,6 +2,7 @@ package sk.tuke.kpi.eprez.streamer.handlers;
 
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vertx.java.core.Handler;
@@ -9,7 +10,8 @@ import org.vertx.java.core.Vertx;
 import org.vertx.java.core.file.AsyncFile;
 import org.vertx.java.core.http.ServerWebSocket;
 
-import sk.tuke.kpi.eprez.streamer.helpers.MulticastPump;
+import sk.tuke.kpi.eprez.streamer.helpers.AbstractMulticastPump;
+import sk.tuke.kpi.eprez.streamer.helpers.MulticastStreamPump;
 
 public class RecordHandler implements Handler<ServerWebSocket> {
 
@@ -19,9 +21,9 @@ public class RecordHandler implements Handler<ServerWebSocket> {
 
 	protected final Vertx vertx;
 
-	private final Map<String, MulticastPump> multicastBus;
+	private final Map<String, AbstractMulticastPump> multicastBus;
 
-	public RecordHandler(final Vertx vertx, final Map<String, MulticastPump> multicastBus) {
+	public RecordHandler(final Vertx vertx, final Map<String, AbstractMulticastPump> multicastBus) {
 		this.vertx = vertx;
 		this.multicastBus = multicastBus;
 	}
@@ -40,11 +42,14 @@ public class RecordHandler implements Handler<ServerWebSocket> {
 				if (recordingFile.succeeded()) {
 					final AsyncFile file = recordingFile.result();
 
-					final MulticastPump multicastPump = MulticastPump.createPump(socket, file).start();
-					multicastBus.put(token, multicastPump);
+					//final WebSocketMessageHandler socketMessageHandler = new WebSocketMessageHandler(socket);
+
+					final AbstractMulticastPump multicastStreamPump = MulticastStreamPump.createPump(socket).add(file).start();
+					multicastBus.put(token, multicastStreamPump);
 
 					final long timerId = vertx.setPeriodic(1000, event -> {
-						LOGGER.info("MulticastPump report: listeners = " + multicastPump.getWriteStreamsCount() + ", total pumped bytes = " + multicastPump.bytesPumped());
+						final String bytesPumped = FileUtils.byteCountToDisplaySize(multicastStreamPump.bytesPumped());
+						LOGGER.info("MulticastStreamPump report: listeners = " + multicastStreamPump.getWriteStreamsCount() + ", total pumped bytes = " + bytesPumped);
 					});
 
 					socket.closeHandler(socketCloseEvent -> {

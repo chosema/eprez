@@ -10,7 +10,7 @@ import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.HttpServerResponse;
 
-import sk.tuke.kpi.eprez.streamer.helpers.MulticastPump;
+import sk.tuke.kpi.eprez.streamer.helpers.AbstractMulticastPump;
 
 public class PlaybackHandler implements Handler<HttpServerRequest> {
 
@@ -18,9 +18,9 @@ public class PlaybackHandler implements Handler<HttpServerRequest> {
 
 	protected final Vertx vertx;
 
-	private final Map<String, MulticastPump> multicastBus;
+	private final Map<String, AbstractMulticastPump> multicastBus;
 
-	public PlaybackHandler(final Vertx vertx, final Map<String, MulticastPump> multicastBus) {
+	public PlaybackHandler(final Vertx vertx, final Map<String, AbstractMulticastPump> multicastBus) {
 		this.vertx = vertx;
 		this.multicastBus = multicastBus;
 	}
@@ -48,5 +48,4 @@ public class PlaybackHandler implements Handler<HttpServerRequest> {
 			}
 		}
 	}
-
 }

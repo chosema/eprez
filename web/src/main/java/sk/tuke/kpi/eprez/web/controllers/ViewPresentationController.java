@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Predicate;
@@ -286,7 +285,7 @@ public class ViewPresentationController extends AbstractController {
 	public void onLaunch() {
 		final Presentation.Session session = new Presentation.Session();
 		session.setRunning(true);
-		session.setCurrentPageIndex(0);
+		session.setCurrentPageIndex(-1);
 		session.setTokens(Arrays.asList(sessionTokenDao.save(new SessionToken(true, getLoggedUser()))));
 
 		presentation.setSession(session);
@@ -300,13 +299,12 @@ public class ViewPresentationController extends AbstractController {
 		if (userToken != null && userToken.isPresenter()) {
 			sendOpenStream(userToken);
 		} else {
-			LOGGER.error("Can not continue on presentation session because of invalid " + userToken);
+			LOGGER.error("Can not continue on presentation session because of invalid token: " + userToken);
 		}
 	}
 
 	public void onStop() {
 		presentation.getSession().setRunning(false);
-		presentation.getSession().setTokens(Collections.emptyList());
 		presentation = presentationDao.save(presentation);
 		showInfoMessage(null, "Presentation session stopped successfully");
 	}
@@ -342,7 +340,7 @@ public class ViewPresentationController extends AbstractController {
 	}
 
 	private void sendOpenStream(final SessionToken token) {
-		RequestContext.getCurrentInstance().execute("window.open('" + getContextPath() + "/streamer/#?token=" + token.getId() + "')");
+		RequestContext.getCurrentInstance().execute("window.open('" + getContextPath() + "/streamer/#/" + token.getId() + "')");
 	}
 
 	public String getId() {

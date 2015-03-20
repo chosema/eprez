@@ -76,6 +76,7 @@ public class Presentation extends AbstractAuditable<String> {
 
 		private boolean running;
 		private int currentPageIndex;
+		private Date started;
 
 		@DBRef(lazy = true)
 		private List<SessionToken> tokens;
@@ -94,6 +95,14 @@ public class Presentation extends AbstractAuditable<String> {
 
 		public void setCurrentPageIndex(final int currentPageIndex) {
 			this.currentPageIndex = currentPageIndex;
+		}
+
+		public Date getStarted() {
+			return started;
+		}
+
+		public void setStarted(final Date started) {
+			this.started = started;
 		}
 
 		public List<SessionToken> getTokens() {
