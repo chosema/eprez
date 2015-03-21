@@ -3,7 +3,7 @@ module.exports = [ '$scope', function($scope) {
 	var player = document.getElementById('player');
 	var playerSource = document.getElementById('playerSource');
 
-	player.playbackRate = 1.1;
+	player.playbackRate = 1.07;
 	playerSource.src = _streamerHttpPath + '/play/' + $scope._token;
 	playerSource.type = 'audio/mpeg';
 

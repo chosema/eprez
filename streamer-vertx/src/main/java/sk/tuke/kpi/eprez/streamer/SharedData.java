@@ -63,7 +63,11 @@ public final class SharedData {
 		void findBySessionToken(String token, LambdaCallback<Document> callback);
 	}
 
-	private static Presentation presentation = new Presentation() {
+	public interface Data {
+		void findOne(String id, LambdaCallback<Document> callback);
+	}
+
+	private static final Presentation presentation = new Presentation() {
 		@Override
 		public void findBySessionToken(final String token, final LambdaCallback<Document> callback) {
 			try {
@@ -72,6 +76,13 @@ public final class SharedData {
 				LOGGER.error("Error occured on call to MongoDb", e);
 				callback.accept(e, null);
 			}
+		}
+	};
+
+	private static final Data data = new Data() {
+		@Override
+		public void findOne(final String id, final LambdaCallback<Document> callback) {
+			getCollectionData().findOneAsync(callback, QueryBuilder.where("_id").equals(new ObjectId(id)));
 		}
 	};
 
@@ -94,7 +105,15 @@ public final class SharedData {
 		return mongoDatabase.getCollection("presentation");
 	}
 
+	private static MongoCollection getCollectionData() {
+		return mongoDatabase.getCollection("data");
+	}
+
 	public static Presentation presentation() {
 		return presentation;
+	}
+
+	public static Data getData() {
+		return data;
 	}
 }

@@ -314,9 +314,9 @@ public class JsonSerializationVisitor implements Visitor {
 	public void visitLong(final String name, final long value) {
 		try {
 			writeName(name);
-			mySink.write("NumberLong('");
+			mySink.write('"');
 			mySink.write(Long.toString(value));
-			mySink.write("')");
+			mySink.write('"');
 			mySink.flush();
 		} catch (final IOException ioe) {
 			throw new JsonException(ioe);

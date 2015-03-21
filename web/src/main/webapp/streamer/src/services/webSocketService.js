@@ -3,6 +3,8 @@ module.exports = [ '$q', 'dataService', function($q, dataService) {
 	var token = dataService.token;
 
 	var ws;
+	
+	var messageHandlers = {}
 
 	if (token) {
 		dataService.loaded.then(function() {
@@ -19,6 +21,15 @@ module.exports = [ '$q', 'dataService', function($q, dataService) {
 			ws.onclose = function() {
 				console.log('WARN: WebSocket connection closed');
 				ws = null;
+			}
+			ws.onmessage = function(message) {
+				var data = JSON.parse(message.data);
+				var typeHandlers = messageHandlers[data.type];
+				if (typeHandlers) {
+					for (var i = 0; i < typeHandlers.length; i++) {
+						typeHandlers[i](data.content, message);
+                    }
+				}
 			}
 		});
 	} else {
@@ -60,11 +71,22 @@ module.exports = [ '$q', 'dataService', function($q, dataService) {
 				if (data === undefined) {
 					ws.send(joinUint8Arrays(strToUint8Array(message), new Uint8Array([0])));
 				} else {
-					ws.send(joinUint8Arrays(strToUint8Array(message), new Uint8Array([0]), data));
+					if (data instanceof Uint8Array) {
+						ws.send(joinUint8Arrays(strToUint8Array(message), new Uint8Array([0]), data));
+					} else {
+						ws.send(joinUint8Arrays(strToUint8Array(message), new Uint8Array([0]), strToUint8Array(data.toString())));
+					}
 				}
 				return true;
 			}
 			return false;
+		},
+		on: function(type, callback) {
+			var typeHandlers = messageHandlers[type];
+			if (typeHandlers === undefined) {
+				messageHandlers[type] = typeHandlers = [];
+			}
+			typeHandlers.push(callback);
 		}
 	}
 }];

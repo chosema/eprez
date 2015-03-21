@@ -42,7 +42,6 @@ public class SimpleRestController {
 		result.put("user", user);
 		result.put("userIsPresenter", presentation.getSession().getTokens().stream().filter(token -> token.getId().equals(sessionToken)).collect(Collectors.toList()).get(0)
 				.isPresenter());
-		result.put("", "");
 		return result;
 	}
 }

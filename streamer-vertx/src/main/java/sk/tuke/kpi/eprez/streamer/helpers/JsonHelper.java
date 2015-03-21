@@ -5,6 +5,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import java.io.StringWriter;
 import java.io.Writer;
 
+import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpHeaders;
 import org.vertx.java.core.http.HttpServerResponse;
 import org.vertx.java.core.json.JsonObject;
@@ -13,6 +14,8 @@ import com.allanbank.mongodb.LambdaCallback;
 import com.allanbank.mongodb.MongoIterator;
 import com.allanbank.mongodb.bson.Document;
 import com.allanbank.mongodb.bson.DocumentAssignable;
+import com.allanbank.mongodb.bson.element.BinaryElement;
+import com.allanbank.mongodb.bson.element.StringElement;
 import com.allanbank.mongodb.error.JsonException;
 
 public class JsonHelper {
@@ -21,6 +24,21 @@ public class JsonHelper {
 		return (LambdaCallback<Document>) (thrown, result) -> {
 			if (thrown == null) {
 				write(response, result);
+			} else {
+				write(response, new JsonObject().putString("error", thrown.getClass().getName()).encode());
+			}
+		};
+	}
+
+	public static LambdaCallback<Document> dataWriter(final HttpServerResponse response) {
+		return (LambdaCallback<Document>) (thrown, result) -> {
+			if (thrown == null) {
+				final String contentType = result.get(StringElement.class, "contentType").getValue();
+				final byte[] content = result.get(BinaryElement.class, "content").getValue();
+				response
+					.putHeader(HttpHeaders.CONTENT_TYPE, contentType)
+					.putHeader(HttpHeaders.CONTENT_LENGTH, String.valueOf(content.length))
+					.write(new Buffer(content)).end();
 			} else {
 				write(response, new JsonObject().putString("error", thrown.getClass().getName()).encode());
 			}
@@ -40,7 +58,12 @@ public class JsonHelper {
 	}
 
 	public static void write(final HttpServerResponse response, final String json, final int statusCode) {
-		response.setStatusCode(statusCode).putHeader(HttpHeaders.CONTENT_TYPE, "application/json").end(json);
+		//@formatter:off
+		response.setStatusCode(statusCode)
+			.putHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "*")
+			.putHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+			.end(json);
+		//@formatter:on
 	}
 
 	public static String serialize(final MongoIterator<Document> data) {

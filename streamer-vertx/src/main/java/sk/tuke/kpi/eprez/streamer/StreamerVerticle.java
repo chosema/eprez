@@ -1,7 +1,6 @@
 package sk.tuke.kpi.eprez.streamer;
 
-import java.util.HashMap;
-import java.util.Map;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,26 +13,12 @@ import sk.tuke.kpi.eprez.streamer.handlers.PlaybackRequestHandler;
 import sk.tuke.kpi.eprez.streamer.handlers.PresenterWebSocketHandler;
 import sk.tuke.kpi.eprez.streamer.handlers.WebSocketHandlerDispatcher;
 import sk.tuke.kpi.eprez.streamer.helpers.JsonHelper;
-import sk.tuke.kpi.eprez.streamer.pumps.AbstractMulticastPump;
-import sk.tuke.kpi.eprez.streamer.pumps.MulticastHandlerPump;
 
 public class StreamerVerticle extends Verticle {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(VerticleExecutor.class);
 
 	private final int port;
-
-	private final Map<String, AbstractMulticastPump> multicastBus = new HashMap<String, AbstractMulticastPump>() {
-		private static final long serialVersionUID = 1L;
-
-		@Override
-		public AbstractMulticastPump get(final Object key) {
-			if (!containsKey(key)) {
-				multicastBus.put(String.valueOf(key), MulticastHandlerPump.createPump("audio.stream.publish"));
-			}
-			return super.get(key);
-		}
-	};
 
 	public StreamerVerticle(final int port) {
 		this.port = port;
@@ -47,15 +32,19 @@ public class StreamerVerticle extends Verticle {
 
 		//@formatter:off
 		httpServer.requestHandler(new RouteMatcher()
-			.noMatch(req -> LOGGER.error("Received HTTP request with no routing: " + req.path()))
-			.get("/play/:token", new PlaybackRequestHandler(vertx, multicastBus))
-			.get("/info/:token", req -> SharedData.presentation().findBySessionToken(req.params().get("token"), JsonHelper.documentWriter(req.response()))));
+			.noMatch(req -> {
+				LOGGER.error("Received HTTP request with no routing: " + req.path());
+				req.response().setStatusCode(HttpResponseStatus.NOT_FOUND.code()).end();
+			})
+			.get("/play/:token", new PlaybackRequestHandler(vertx))
+			.get("/info/:token.json", req -> SharedData.presentation().findBySessionToken(req.params().get("token"), JsonHelper.documentWriter(req.response())))
+			.get("/data/:id", req -> SharedData.getData().findOne(req.params().get("id"), JsonHelper.dataWriter(req.response()))));
 		//@formatter:on
 
 		//@formatter:off
 		httpServer.websocketHandler(new WebSocketHandlerDispatcher()
-			.on("/listen/:token", new ListenerWebSocketHandler(vertx, multicastBus))
-			.on("/record/:token", new PresenterWebSocketHandler(vertx, multicastBus)));
+			.on("/listen/:token", new ListenerWebSocketHandler(vertx))
+			.on("/record/:token", new PresenterWebSocketHandler(vertx)));
 		//@formatter:on
 
 		httpServer.listen(port);

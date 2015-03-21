@@ -1,17 +1,14 @@
 package sk.tuke.kpi.eprez.streamer.handlers;
 
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.ServerWebSocket;
+import org.vertx.java.core.json.JsonObject;
 
+import sk.tuke.kpi.eprez.streamer.EventBusAddressHolder;
 import sk.tuke.kpi.eprez.streamer.SharedData;
-import sk.tuke.kpi.eprez.streamer.helpers.Formatter;
-import sk.tuke.kpi.eprez.streamer.pumps.AbstractMulticastPump;
-import sk.tuke.kpi.eprez.streamer.pumps.MulticastHandlerPump;
 
 import com.allanbank.mongodb.bson.element.ObjectId;
 
@@ -23,11 +20,8 @@ public class PresenterWebSocketHandler implements Handler<ServerWebSocket> {
 
 	protected final Vertx vertx;
 
-	private final Map<String, AbstractMulticastPump> multicastBus;
-
-	public PresenterWebSocketHandler(final Vertx vertx, final Map<String, AbstractMulticastPump> multicastBus) {
+	public PresenterWebSocketHandler(final Vertx vertx) {
 		this.vertx = vertx;
-		this.multicastBus = multicastBus;
 	}
 
 	@Override
@@ -37,22 +31,22 @@ public class PresenterWebSocketHandler implements Handler<ServerWebSocket> {
 		SharedData.presentation().findBySessionToken(sessionToken, (throwable, result) -> {
 			LOGGER.info("Received new recorder on recording uri with sessionToken: " + sessionToken);
 
-			final String token = ((ObjectId) result.get("_id").getValueAsObject()).toHexString();
+			final String presentationId = ((ObjectId) result.get("_id").getValueAsObject()).toHexString();
+			final String audioStreamAddress = EventBusAddressHolder.presentationAudioStream(presentationId);
 
 			final WebSocketMessageHandler socketMessageHandler = new WebSocketMessageHandler(socket);
-			final MulticastHandlerPump multicastStreamPump = (MulticastHandlerPump) multicastBus.get(token);
-			multicastStreamPump.handler(socketMessageHandler).start();
-
-			final long timerId = vertx.setPeriodic(3000, event -> {
-				final String bytesFormatted = Formatter.bytes(multicastStreamPump.bytesPumped());
-				LOGGER.info("MulticastStreamPump report: listeners = " + multicastStreamPump.getListenersCount() + ", total pumped bytes = " + bytesFormatted);
+			socketMessageHandler.on("send:audio.stream.publish", buffer -> {
+				vertx.eventBus().publish(audioStreamAddress, buffer);
+			});
+			socketMessageHandler.on("send:document.stream.publish", buffer -> {
+				LOGGER.info("New document published: " + buffer);
+				final String encodedMessage = new JsonObject().putString("type", "push:document.stream.publish").putString("content", buffer.toString()).encode();
+				vertx.eventBus().publish(EventBusAddressHolder.presentationDocumentStream(presentationId), encodedMessage);
+				socket.writeTextFrame(encodedMessage);
 			});
 
 			socket.closeHandler(socketCloseEvent -> {
 				LOGGER.info("Closing socket");
-				multicastStreamPump.stop();
-				vertx.cancelTimer(timerId);
-				multicastStreamPump.handler(null);
 			});
 
 //			final String fileName = RECORDING_FILES + token + ".mp3";
@@ -65,6 +59,6 @@ public class PresenterWebSocketHandler implements Handler<ServerWebSocket> {
 //					}
 //				});
 //			});
-		});
+			});
 	}
 }

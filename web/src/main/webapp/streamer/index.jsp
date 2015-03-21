@@ -6,7 +6,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Bootstrap 101 Template</title>
+<title>ePrez - Streamer</title>
 
 <!-- Bootstrap -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
@@ -22,11 +22,16 @@
       <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
+    
+<%
+	final String _streamerHttpPath = WebApplicationContextUtils.getWebApplicationContext(getServletContext()).getEnvironment().resolvePlaceholders("${streamer.http.url}");
+	final String _streamerWsPath = WebApplicationContextUtils.getWebApplicationContext(getServletContext()).getEnvironment().resolvePlaceholders("${streamer.ws.url}");
+%>
 
 <script type="text/javascript">
 	var _contextPath = '<%=request.getContextPath()%>';
-	var _streamerHttpPath = '<%=WebApplicationContextUtils.getWebApplicationContext(getServletContext()).getEnvironment().resolvePlaceholders("${streamer.http.url}")%>';
-	var _streamerWsPath = '<%=WebApplicationContextUtils.getWebApplicationContext(getServletContext()).getEnvironment().resolvePlaceholders("${streamer.ws.url}")%>';
+	var _streamerHttpPath = '<%=_streamerHttpPath%>';
+	var _streamerWsPath = '<%=_streamerWsPath%>';
 </script>
 </head>
 <body ng-controller="rootController">
@@ -60,26 +65,21 @@
 
 		<!-- Wrapper for slides -->
 		<div class="carousel-inner" role="listbox">
-			<div class="item active">
-				<img src="">
-				<div class="carousel-caption">...</div>
-			</div>
-			<div class="item">
-				<img src="" alt="...">
-				<div class="carousel-caption">...</div>
-			</div>
-			<div class="item">
-				<img src="" alt="...">
-				<div class="carousel-caption">...</div>
+			<div class="item" ng-repeat="page in _presentation.document.pages" ng-class="_presentation.session.currentPageIndex == $index ? 'active' : ''" ng-style="page.style">
+				<!-- ng-style="page.style" -->
+				<!-- <img ng-src="{{page.src}}" style="height: 100%; margin: 0 auto; display: block;"> -->
+				<div class="carousel-caption" style="color: gray;">Current slide: {{page.index + 1}}</div>
 			</div>
 		</div>
 
 		<!-- Controls -->
-		<a class="left carousel-control" href="" role="button" ng-show="_userIsPresenter && _presentation.session.currentPageIndex > 0">
+		<a class="left carousel-control" href="" role="button" ng-click="onPreviousSlide()"
+			ng-show="_userIsPresenter && _presentation.session.currentPageIndex > 0">
 			<span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
 			<span class="sr-only">Previous</span>
 		</a>
-		<a class="right carousel-control" href="" role="button" ng-show="_userIsPresenter && _presentation.session.currentPageIndex < _presentation.document.pages.length - 1">
+		<a class="right carousel-control" href="" role="button" ng-click="onNextSlide()"
+			ng-show="_userIsPresenter && _presentation.session.currentPageIndex < _presentation.document.pages.length - 1">
 			<span class="glyphicon glyphicon-chevron-right"	aria-hidden="true"></span>
 			<span class="sr-only">Next</span>
 		</a>

@@ -3,9 +3,6 @@ package sk.tuke.kpi.eprez.core.model;
 import java.io.Serializable;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class DocumentPage implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -15,17 +12,15 @@ public class DocumentPage implements Serializable {
 	private int index;
 	private String format;
 
-	@JsonIgnore
-	@DBRef(lazy = true)
-	private Data data;
+	private String dataRef;
 
 	public DocumentPage() { // default constructor
 	}
 
-	public DocumentPage(final int index, final String format, final Data data) {
+	public DocumentPage(final int index, final String format, final String dataRef) {
 		this.index = index;
 		this.format = format;
-		this.data = data;
+		this.dataRef = dataRef;
 	}
 
 	public String getId() {
@@ -52,13 +47,11 @@ public class DocumentPage implements Serializable {
 		this.format = imageFormat;
 	}
 
-	@JsonIgnore
-	public Data getData() {
-		return data;
+	public String getDataRef() {
+		return dataRef;
 	}
 
-	@JsonIgnore
-	public void setData(final Data data) {
-		this.data = data;
+	public void setDataRef(final String dataRef) {
+		this.dataRef = dataRef;
 	}
 }

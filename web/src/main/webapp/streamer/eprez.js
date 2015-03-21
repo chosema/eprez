@@ -6,14 +6,74 @@ module.exports = angular.module('eprezApp.controllers', [])
         .controller('documentCarouselController', require('./documentCarouselController'))
 
 },{"./documentCarouselController":"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\controllers\\documentCarouselController.js","./playerController":"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\controllers\\playerController.js","./recorderController":"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\controllers\\recorderController.js","./rootController":"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\controllers\\rootController.js"}],"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\controllers\\documentCarouselController.js":[function(require,module,exports){
-module.exports = [ '$scope', function($scope) {
-    $scope.test = 'Hello World!'
+module.exports = [ '$scope', 'webSocketService', function($scope, webSocketService) {
 
-    // var img = document.createElement("img")
-    // img.src = (window.URL || window.webkitURL)
-    // .createObjectURL(new Blob(parts))
-    // document.body.appendChild(img)
+	jQuery(document).on('keydown', function(event) {
+		// keyCode = 37 left arrow
+		// keyCode = 39 right arrow
+		if (event.keyCode == 37) {
+			$scope.onPreviousSlide();
+		} else if (event.keyCode == 39) {
+			$scope.onNextSlide();
+		}
+	});
 
+	var documentCarousel = jQuery('#document-carousel');
+	documentCarousel.carousel({
+		interval: false
+	});
+
+	webSocketService.on('push:document.stream.publish', function(message) {
+		console.log('Received new document page index: ' + message);
+		setSlide(parseInt(message));
+	});
+
+	$scope._loaded.then(function() {
+		var currentIndex = $scope._presentation.session.currentPageIndex;
+		var pages = $scope._presentation.document.pages;
+		if (pages && pages[currentIndex]) {
+			setPageData(pages[currentIndex], false);
+			setPageData(pages[currentIndex], true);
+		}
+	});
+
+	$scope.onPreviousSlide = function() {
+		if ($scope._presentation.session.currentPageIndex > 0) {
+			var index = $scope._presentation.session.currentPageIndex;
+    		webSocketService.send('send:document.stream.publish', index - 1);
+		}
+    };
+    $scope.onNextSlide = function() {
+    	if ($scope._presentation.session.currentPageIndex < $scope._presentation.document.pages.length - 1) {
+    		var index = $scope._presentation.session.currentPageIndex;
+    		webSocketService.send('send:document.stream.publish', index + 1);
+    	}
+    };
+
+    function setSlide(index) {
+    	$scope._presentation.session.currentPageIndex = index;
+		setPageData($scope._presentation.document.pages[index], true, function() {
+			documentCarousel.carousel(index);
+		});
+    }
+
+    function setPageData(page, apply, sucessCallback, errorCallback) {
+    	if (page.style === undefined) {
+    		page.src = _streamerHttpPath + "/data/" + page.dataRef;
+    		page.style = {
+    			'background-image': "url('" + page.src + "')",
+    			'background-repeat': "no-repeat",
+    			'background-position': "center top",
+    			'background-size': "contain"
+    		};
+    		if (apply) {
+    			$scope.$apply();
+    		}
+    		jQuery("<img />").load(sucessCallback).error(errorCallback).attr("src", page.src);
+    	} else if (sucessCallback) {
+    		sucessCallback();
+    	}
+    }
 }]
 
 },{}],"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\controllers\\playerController.js":[function(require,module,exports){
@@ -22,7 +82,7 @@ module.exports = [ '$scope', function($scope) {
 	var player = document.getElementById('player');
 	var playerSource = document.getElementById('playerSource');
 
-	player.playbackRate = 1.1;
+	player.playbackRate = 1.07;
 	playerSource.src = _streamerHttpPath + '/play/' + $scope._token;
 	playerSource.type = 'audio/mpeg';
 
@@ -63,7 +123,7 @@ module.exports = [ '$scope', 'webSocketService', function($scope, webSocketServi
 		$scope.encoder.postMessage({ cmd: 'init', config: { samplerate: $scope.samplerate, bitrate: $scope.bitrate } });
 
 		$scope.encoder.onmessage = function(e) {
-			var sent = webSocketService.send('audio.stream.publish', e.data.buf);
+			var sent = webSocketService.send('send:audio.stream.publish', e.data.buf);
 			if (!sent && $scope.recording) {
 				console.log('ERROR: Sending audio stream data to WebSocket failed');
 				$scope.stopRecording(true);
@@ -186,6 +246,8 @@ module.exports = [ '$q', 'dataService', function($q, dataService) {
 	var token = dataService.token;
 
 	var ws;
+	
+	var messageHandlers = {}
 
 	if (token) {
 		dataService.loaded.then(function() {
@@ -202,6 +264,15 @@ module.exports = [ '$q', 'dataService', function($q, dataService) {
 			ws.onclose = function() {
 				console.log('WARN: WebSocket connection closed');
 				ws = null;
+			}
+			ws.onmessage = function(message) {
+				var data = JSON.parse(message.data);
+				var typeHandlers = messageHandlers[data.type];
+				if (typeHandlers) {
+					for (var i = 0; i < typeHandlers.length; i++) {
+						typeHandlers[i](data.content, message);
+                    }
+				}
 			}
 		});
 	} else {
@@ -243,11 +314,22 @@ module.exports = [ '$q', 'dataService', function($q, dataService) {
 				if (data === undefined) {
 					ws.send(joinUint8Arrays(strToUint8Array(message), new Uint8Array([0])));
 				} else {
-					ws.send(joinUint8Arrays(strToUint8Array(message), new Uint8Array([0]), data));
+					if (data instanceof Uint8Array) {
+						ws.send(joinUint8Arrays(strToUint8Array(message), new Uint8Array([0]), data));
+					} else {
+						ws.send(joinUint8Arrays(strToUint8Array(message), new Uint8Array([0]), strToUint8Array(data.toString())));
+					}
 				}
 				return true;
 			}
 			return false;
+		},
+		on: function(type, callback) {
+			var typeHandlers = messageHandlers[type];
+			if (typeHandlers === undefined) {
+				messageHandlers[type] = typeHandlers = [];
+			}
+			typeHandlers.push(callback);
 		}
 	}
 }];

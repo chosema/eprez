@@ -172,9 +172,8 @@ public class ViewPresentationController extends AbstractController {
 
 				documentProcessor.process(new ByteArrayInputStream(attachment.getData().getContent()), (index, imageData, image) -> {
 					final Data data = dataDao.save(new Data(imageData, contentType, imageData.length));
-					final DocumentPage documentPage = documentPageDao.save(new DocumentPage(index, format, data));
+					final DocumentPage documentPage = documentPageDao.save(new DocumentPage(index, format, data.getId()));
 					document.getPages().add(documentPage);
-
 				});
 
 				document.setState(DocumentState.SUCCESSFULL);
@@ -285,7 +284,7 @@ public class ViewPresentationController extends AbstractController {
 	public void onLaunch() {
 		final Presentation.Session session = new Presentation.Session();
 		session.setRunning(true);
-		session.setCurrentPageIndex(-1);
+		session.setCurrentPageIndex(0);
 		session.setTokens(Arrays.asList(sessionTokenDao.save(new SessionToken(true, getLoggedUser()))));
 
 		presentation.setSession(session);

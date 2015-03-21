@@ -18,7 +18,7 @@ module.exports = [ '$scope', 'webSocketService', function($scope, webSocketServi
 		$scope.encoder.postMessage({ cmd: 'init', config: { samplerate: $scope.samplerate, bitrate: $scope.bitrate } });
 
 		$scope.encoder.onmessage = function(e) {
-			var sent = webSocketService.send('audio.stream.publish', e.data.buf);
+			var sent = webSocketService.send('send:audio.stream.publish', e.data.buf);
 			if (!sent && $scope.recording) {
 				console.log('ERROR: Sending audio stream data to WebSocket failed');
 				$scope.stopRecording(true);

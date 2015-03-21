@@ -10,3 +10,20 @@ html, body {
 .carousel-indicators .active {
 	background-color: #6B6B6B;
 }
+
+.carousel-inner {
+	height: 100%;
+}
+
+.carousel-inner .item {
+	height: 100%;
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
+	background-size: cover;
+	color: #fff;
+	background-color: #333;
+	
+	border-left: 1px solid gray;
+	border-right: 1px solid gray;
+}
