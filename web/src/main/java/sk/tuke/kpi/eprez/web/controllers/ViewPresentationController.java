@@ -340,7 +340,7 @@ public class ViewPresentationController extends AbstractController {
 	}
 
 	private void sendOpenStream(final SessionToken token) {
-		RequestContext.getCurrentInstance().execute("window.open('" + getContextPath() + "/streamer/#/" + token.getId() + "')");
+		RequestContext.getCurrentInstance().execute("window.open('" + getContextPath() + "/streamer/?" + token.getId() + "')");
 	}
 
 	public String getId() {

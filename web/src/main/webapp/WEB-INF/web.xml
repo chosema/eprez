@@ -42,7 +42,8 @@
 		<param-name>javax.faces.INTERPRET_EMPTY_STRING_SUBMITTED_VALUES_AS_NULL</param-name>
 		<param-value>true</param-value>
 	</context-param>
-	<!-- State saving method: 'client' or 'server' (=default). See JSF Specification 2.5.2 -->
+	<!-- State saving method: 'client' or 'server' (=default). See JSF Specification 
+		2.5.2 -->
 	<context-param>
 		<param-name>javax.faces.STATE_SAVING_METHOD</param-name>
 		<param-value>server</param-value>
@@ -54,7 +55,8 @@
 	</context-param>
 
 	<!-- PRIMEFACES CONFIGURATION PARAMETERS -->
-	<!-- Transformation of validation rules (Java Bean Validation) to forms, ie. NotNull, MaxLength,... -->
+	<!-- Transformation of validation rules (Java Bean Validation) to forms, 
+		ie. NotNull, MaxLength,... -->
 	<context-param>
 		<param-name>primefaces.TRANSFORM_METADATA</param-name>
 		<param-value>true</param-value>
@@ -76,21 +78,39 @@
 	</context-param>
 
 	<filter>
-		<filter-name>PrimeFaces FileUpload Filter</filter-name>
+		<filter-name>CORSFilter</filter-name>
+		<filter-class>sk.tuke.kpi.eprez.web.filters.SimpleCORSFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>CORSFilter</filter-name>
+		<url-pattern>/streamer/*</url-pattern>
+	</filter-mapping>
+
+	<servlet>
+		<servlet-name>dispatcherServlet</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<param-name>contextClass</param-name>
+			<param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
+		</init-param>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>sk.tuke.kpi.eprez.web.rest.RestConfig</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>dispatcherServlet</servlet-name>
+		<url-pattern>*.json</url-pattern>
+	</servlet-mapping>
+
+	<filter>
+		<filter-name>PrimeFacesFileUploadFilter</filter-name>
 		<filter-class>org.primefaces.webapp.filter.FileUploadFilter</filter-class>
 	</filter>
 	<filter-mapping>
-		<filter-name>PrimeFaces FileUpload Filter</filter-name>
+		<filter-name>PrimeFacesFileUploadFilter</filter-name>
 		<servlet-name>FacesServlet</servlet-name>
-	</filter-mapping>
-	
-	<filter>
-		<filter-name>CORS Filter</filter-name>
-		<filter-class>sk.tuke.kpi.eprez.web.SimpleCORSFilter</filter-class>
-	</filter>
-	<filter-mapping>
-		<filter-name>CORS Filter</filter-name>
-		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
 	<servlet>

@@ -5,23 +5,26 @@ module.exports = [ '$q', 'dataService', function($q, dataService) {
 	var ws;
 
 	if (token) {
-		var address = 'ws://localhost:8090/record/' + token;
-		ws = new WebSocket(address);
-		ws.onopen = function() {
-			console.log('INFO: WebSocket connection sucessfully opened on: ' + address);
-		}
-		ws.onerror = function() {
-			ws = null;
-		}
-		ws.onclose = function() {
-			console.log('WARN: WebSocket connection closed');
-			ws = null;
-		}
+		dataService.loaded.then(function() {
+			console.log('INFO: Opening WebSocket connection as ' + (dataService.info.userIsPresenter ? 'presenter' : 'listener'));
+			var address = _streamerWsPath + (dataService.info.userIsPresenter ? '/record/' : '/listen/') + token;
+			
+			ws = new WebSocket(address);
+			ws.onopen = function() {
+				console.log('INFO: WebSocket connection sucessfully opened on: ' + address);
+			}
+			ws.onerror = function() {
+				ws = null;
+			}
+			ws.onclose = function() {
+				console.log('WARN: WebSocket connection closed');
+				ws = null;
+			}
+		});
 	} else {
 		ws = null;
 		console.log('ERROR: WebSocket connection can not be established because of invalid token: ' + token);
 	}
-	
 
 	function strToUint8Array(str) {
 		if (str) {

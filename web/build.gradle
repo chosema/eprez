@@ -23,19 +23,22 @@ dependencyManagement {
 dependencies {
 	compile project(':core')
 
-    compile group: 'org.springframework', name: 'spring-webmvc'
-	compile group: 'org.springframework.security', name: 'spring-security-web'
-	compile group: 'org.springframework.security', name: 'spring-security-config'
-    compile group: 'javax.enterprise', name: 'cdi-api', version:'1.0-SP4'
-    compile group: 'com.sun.faces', name: 'jsf-api'
-    compile group: 'com.sun.faces', name: 'jsf-impl'
-    compile group: 'org.primefaces', name: 'primefaces', version:'5.1'
-    compile group: 'org.primefaces.themes', name: 'flick', version:'1.0.10'
-    compile group: 'commons-fileupload', name: 'commons-fileupload'
+    compile 'org.springframework:spring-webmvc'
+	compile 'org.springframework.security:spring-security-web'
+	compile 'org.springframework.security:spring-security-config'
+    compile 'javax.enterprise:cdi-api:1.0-SP4'
+    compile 'com.sun.faces:jsf-api'
+    compile 'com.sun.faces:jsf-impl'
+    compile 'org.primefaces:primefaces:5.1'
+    compile 'org.primefaces.themes:flick:1.0.10'
+
+    compile 'com.fasterxml.jackson.core:jackson-databind'
+
+    compile 'commons-fileupload:commons-fileupload'
 
     testCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-test') {
 		exclude(module: 'commons-logging')
     }
 
-    providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version:'3.0.1'
+    providedCompile 'javax.servlet:javax.servlet-api:3.0.1'
 }

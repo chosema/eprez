@@ -16,6 +16,8 @@ import sk.tuke.kpi.eprez.core.model.enums.DocumentState;
 import sk.tuke.kpi.eprez.core.model.enums.PresentationCategory;
 import sk.tuke.kpi.eprez.core.model.enums.RestrictionType;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Document
 public class Presentation extends AbstractAuditable<String> {
 	private static final long serialVersionUID = 1L;
@@ -26,7 +28,7 @@ public class Presentation extends AbstractAuditable<String> {
 		private String name;
 		private DocumentState state;
 
-		@DBRef(lazy = true)
+		@DBRef
 		private List<DocumentPage> pages;
 
 		public Document() { // default constructor
@@ -78,7 +80,7 @@ public class Presentation extends AbstractAuditable<String> {
 		private int currentPageIndex;
 		private Date started;
 
-		@DBRef(lazy = true)
+		@DBRef
 		private List<SessionToken> tokens;
 
 		public boolean isRunning() {
@@ -134,6 +136,7 @@ public class Presentation extends AbstractAuditable<String> {
 	private List<PresentationCategory> categories;
 	@DBRef
 	private List<Attachment> attachments;
+	@JsonIgnore
 	@DBRef(lazy = true)
 	private Data image;
 
@@ -210,10 +213,12 @@ public class Presentation extends AbstractAuditable<String> {
 		this.views = views;
 	}
 
+	@JsonIgnore
 	public Data getImage() {
 		return image;
 	}
 
+	@JsonIgnore
 	public void setImage(final Data image) {
 		this.image = image;
 	}

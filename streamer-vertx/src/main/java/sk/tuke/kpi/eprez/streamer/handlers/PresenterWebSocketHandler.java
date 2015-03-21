@@ -8,14 +8,18 @@ import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.ServerWebSocket;
 
+import sk.tuke.kpi.eprez.streamer.SharedData;
 import sk.tuke.kpi.eprez.streamer.helpers.Formatter;
 import sk.tuke.kpi.eprez.streamer.pumps.AbstractMulticastPump;
+import sk.tuke.kpi.eprez.streamer.pumps.MulticastHandlerPump;
+
+import com.allanbank.mongodb.bson.element.ObjectId;
 
 public class PresenterWebSocketHandler implements Handler<ServerWebSocket> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PresenterWebSocketHandler.class);
 
-	private static final String RECORDING_FILES = "C:\\Users\\pchov_000\\Desktop\\";
+	protected static final String RECORDING_FILES = "C:\\Users\\pchov_000\\Desktop\\";
 
 	protected final Vertx vertx;
 
@@ -28,16 +32,16 @@ public class PresenterWebSocketHandler implements Handler<ServerWebSocket> {
 
 	@Override
 	public void handle(final ServerWebSocket socket) {
-		final String token = socket.headers().get("token");
-		if (token == null) { // TODO validate token
-			LOGGER.info("Invalid recording uri: " + socket.uri());
-			socket.close();
-		} else {
-			LOGGER.info("Recording uri is valid: token=" + token);
+		final String sessionToken = socket.headers().get("token");
+
+		SharedData.presentation().findBySessionToken(sessionToken, (throwable, result) -> {
+			LOGGER.info("Received new recorder on recording uri with sessionToken: " + sessionToken);
+
+			final String token = ((ObjectId) result.get("_id").getValueAsObject()).toHexString();
 
 			final WebSocketMessageHandler socketMessageHandler = new WebSocketMessageHandler(socket);
-			final AbstractMulticastPump multicastStreamPump = socketMessageHandler.pump("audio.stream.publish").start();
-			multicastBus.put(token, multicastStreamPump);
+			final MulticastHandlerPump multicastStreamPump = (MulticastHandlerPump) multicastBus.get(token);
+			multicastStreamPump.handler(socketMessageHandler).start();
 
 			final long timerId = vertx.setPeriodic(3000, event -> {
 				final String bytesFormatted = Formatter.bytes(multicastStreamPump.bytesPumped());
@@ -48,21 +52,19 @@ public class PresenterWebSocketHandler implements Handler<ServerWebSocket> {
 				LOGGER.info("Closing socket");
 				multicastStreamPump.stop();
 				vertx.cancelTimer(timerId);
-				multicastBus.remove(token);
+				multicastStreamPump.handler(null);
 			});
 
-			// Recording audio stream also to file
-			final String fileName = RECORDING_FILES + token + ".mp3";
-			vertx.fileSystem().delete(fileName, event -> {
-				vertx.fileSystem().open(fileName, recordingFile -> {
-					if (recordingFile.succeeded()) {
-						multicastStreamPump.add(recordingFile.result());
-					} else {
-						LOGGER.error("Recording failed: cannot open file for recording");
-					}
-				});
-			});
-
-		}
+//			final String fileName = RECORDING_FILES + token + ".mp3";
+//			vertx.fileSystem().delete(fileName, event -> {
+//				vertx.fileSystem().open(fileName, recordingFile -> {
+//					if (recordingFile.succeeded()) {
+//						multicastStreamPump.add(recordingFile.result());
+//					} else {
+//						LOGGER.error("Recording failed: cannot open file for recording");
+//					}
+//				});
+//			});
+		});
 	}
 }

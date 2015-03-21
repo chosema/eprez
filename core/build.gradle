@@ -26,6 +26,8 @@ dependencies {
     compile group: 'org.apache.commons', name: 'commons-lang3'
     compile group: 'commons-collections', name: 'commons-collections'
     compile group: 'org.apache.pdfbox', name: 'pdfbox', version:'1.8.8'
+    
+    compile 'com.fasterxml.jackson.core:jackson-annotations'
 
     testCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-test') {
 		exclude(module: 'commons-logging')

@@ -9,6 +9,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Document
 public class User implements HasId<String> {
 	private static final long serialVersionUID = 1L;
@@ -22,10 +24,12 @@ public class User implements HasId<String> {
 	private String firstName;
 	private String lastName;
 	@NotNull
+	@JsonIgnore
 	private String password;
 	@NotNull
 	private String email;
 
+	@JsonIgnore
 	private Set<String> roles;
 
 	public User() { // default constructor
@@ -76,10 +80,12 @@ public class User implements HasId<String> {
 		this.lastName = lastName;
 	}
 
+	@JsonIgnore
 	public String getPassword() {
 		return password;
 	}
 
+	@JsonIgnore
 	public void setPassword(final String password) {
 		this.password = password;
 	}
@@ -92,10 +98,12 @@ public class User implements HasId<String> {
 		this.email = email;
 	}
 
+	@JsonIgnore
 	public Set<String> getRoles() {
 		return roles == null ? (roles = new HashSet<>(2)) : roles;
 	}
 
+	@JsonIgnore
 	public void setRoles(final Set<String> roles) {
 		this.roles = roles;
 	}

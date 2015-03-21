@@ -13,7 +13,7 @@ public class SessionToken implements HasId<String> {
 
 	private boolean presenter;
 
-	@DBRef(lazy = true)
+	@DBRef
 	private User user;
 
 	public SessionToken() { // default constructor

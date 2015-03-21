@@ -9,6 +9,8 @@ import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public abstract class AbstractAuditable<PK extends Serializable> implements HasId<PK> {
 	private static final long serialVersionUID = 1L;
 
@@ -21,9 +23,11 @@ public abstract class AbstractAuditable<PK extends Serializable> implements HasI
 
 	@DBRef
 	@LastModifiedBy
+	@JsonIgnore
 	protected User lastModifiedBy;
 
 	@LastModifiedDate
+	@JsonIgnore
 	protected Date lastModifiedDate;
 
 	public User getCreatedBy() {
@@ -42,18 +46,22 @@ public abstract class AbstractAuditable<PK extends Serializable> implements HasI
 		this.createdDate = createdDate;
 	}
 
+	@JsonIgnore
 	public User getLastModifiedBy() {
 		return lastModifiedBy;
 	}
 
+	@JsonIgnore
 	public void setLastModifiedBy(final User lastModifiedBy) {
 		this.lastModifiedBy = lastModifiedBy;
 	}
 
+	@JsonIgnore
 	public Date getLastModifiedDate() {
 		return lastModifiedDate;
 	}
 
+	@JsonIgnore
 	public void setLastModifiedDate(final Date lastModifiedDate) {
 		this.lastModifiedDate = lastModifiedDate;
 	}

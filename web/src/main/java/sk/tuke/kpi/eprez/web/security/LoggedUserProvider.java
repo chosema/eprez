@@ -40,5 +40,4 @@ public class LoggedUserProvider implements AuditorAware<User> {
 			return authentication.getName();
 		}
 	}
-
 }

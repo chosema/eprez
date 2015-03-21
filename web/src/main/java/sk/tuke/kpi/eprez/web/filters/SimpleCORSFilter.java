@@ -1,4 +1,4 @@
-package sk.tuke.kpi.eprez.web;
+package sk.tuke.kpi.eprez.web.filters;
 
 import java.io.IOException;
 

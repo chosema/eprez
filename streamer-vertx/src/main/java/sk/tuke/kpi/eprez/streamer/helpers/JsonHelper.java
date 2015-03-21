@@ -17,8 +17,8 @@ import com.allanbank.mongodb.error.JsonException;
 
 public class JsonHelper {
 
-	public static LambdaCallback<MongoIterator<Document>> documentsWriter(final HttpServerResponse response) {
-		return (LambdaCallback<MongoIterator<Document>>) (thrown, result) -> {
+	public static LambdaCallback<Document> documentWriter(final HttpServerResponse response) {
+		return (LambdaCallback<Document>) (thrown, result) -> {
 			if (thrown == null) {
 				write(response, result);
 			} else {

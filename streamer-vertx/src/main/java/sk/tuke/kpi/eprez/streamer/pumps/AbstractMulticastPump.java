@@ -45,6 +45,15 @@ public abstract class AbstractMulticastPump {
 	protected int defaultWriteQueueMaxSize;
 	protected int pumped;
 
+	protected final Handler<Buffer> dataHandler = buffer -> {
+		for (final Listener listener : listeners) {
+			if (!listener.getWriteStream().writeQueueFull()) {
+				listener.getWriteStream().write(buffer);
+			}
+		}
+		pumped += buffer.length();
+	};
+
 //	private final Handler<Void> drainHandler = new Handler<Void>() {
 //		@Override
 //		public void handle(final Void v) {
@@ -59,15 +68,6 @@ public abstract class AbstractMulticastPump {
 	public AbstractMulticastPump(final int defaultWriteQueueMaxSize) {
 		this.defaultWriteQueueMaxSize = defaultWriteQueueMaxSize;
 	}
-
-	protected final Handler<Buffer> dataHandler = buffer -> {
-		for (final Listener listener : listeners) {
-			if (!listener.getWriteStream().writeQueueFull()) {
-				listener.getWriteStream().write(buffer);
-			}
-		}
-		pumped += buffer.length();
-	};
 
 	public AbstractMulticastPump add(final WriteStream<?> ws) {
 		return add(new Listener(ws));

@@ -1,7 +1,5 @@
 package sk.tuke.kpi.eprez.streamer.handlers;
 
-import io.netty.handler.codec.http.HttpResponseStatus;
-
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -11,7 +9,10 @@ import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.HttpServerResponse;
 
+import sk.tuke.kpi.eprez.streamer.SharedData;
 import sk.tuke.kpi.eprez.streamer.pumps.AbstractMulticastPump;
+
+import com.allanbank.mongodb.bson.element.ObjectId;
 
 public class PlaybackRequestHandler implements Handler<HttpServerRequest> {
 
@@ -28,18 +29,20 @@ public class PlaybackRequestHandler implements Handler<HttpServerRequest> {
 
 	@Override
 	public void handle(final HttpServerRequest req) {
-		final String token = req.params().get("token");
-		final HttpServerResponse response = req.response();
-		if (multicastBus.containsKey(token)) {
-			LOGGER.info("New listener received on playback uri with token: " + token);
-			multicastBus.get(token).add(response.setChunked(true), token);
+		final String sessionToken = req.params().get("token");
+		SharedData.presentation().findBySessionToken(sessionToken, (throwable, result) -> {
+			final String token = ((ObjectId) result.get("_id").getValueAsObject()).toHexString();
+			// TODO validate token
+			// LOGGER.error("Multicast on address token " + token + " is not available");
+			// req.response().setStatusCode(HttpResponseStatus.NOT_FOUND.code()).end();
+
+			LOGGER.info("Received new listener on playback uri with sessionToken: " + token);
+			final HttpServerResponse response = req.response();
+			multicastBus.get(token).add(response.setChunked(true), sessionToken);
 			response.closeHandler(event -> {
 				LOGGER.info("Connection with listener has been lost...removing from multicast bus");
 				multicastBus.get(token).remove(response);
 			});
-		} else {
-			LOGGER.error("Multicast on address token " + token + " is not available");
-			response.setStatusCode(HttpResponseStatus.NOT_FOUND.code()).end();
-		}
+		});
 	}
 }

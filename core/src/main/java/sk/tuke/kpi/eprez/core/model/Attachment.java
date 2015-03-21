@@ -5,6 +5,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Document
 public class Attachment extends AbstractAuditable<String> {
 	private static final long serialVersionUID = 1L;
@@ -17,6 +19,7 @@ public class Attachment extends AbstractAuditable<String> {
 	private long size;
 	private boolean available;
 
+	@JsonIgnore
 	@DBRef(lazy = true)
 	private Data data;
 
@@ -62,10 +65,12 @@ public class Attachment extends AbstractAuditable<String> {
 		this.available = available;
 	}
 
+	@JsonIgnore
 	public Data getData() {
 		return data;
 	}
 
+	@JsonIgnore
 	public void setData(final Data data) {
 		this.data = data;
 	}

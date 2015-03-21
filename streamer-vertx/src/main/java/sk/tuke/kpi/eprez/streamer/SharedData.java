@@ -16,7 +16,6 @@ import com.allanbank.mongodb.MongoClientConfiguration;
 import com.allanbank.mongodb.MongoCollection;
 import com.allanbank.mongodb.MongoDatabase;
 import com.allanbank.mongodb.MongoFactory;
-import com.allanbank.mongodb.MongoIterator;
 import com.allanbank.mongodb.bson.Document;
 import com.allanbank.mongodb.bson.element.ObjectId;
 import com.allanbank.mongodb.builder.QueryBuilder;
@@ -60,15 +59,15 @@ public final class SharedData {
 		mongoDatabase = mongoClient.getDatabase(database);
 	}
 
-	interface Presentation {
-		void findBySessionToken(String token, LambdaCallback<MongoIterator<Document>> callback);
+	public interface Presentation {
+		void findBySessionToken(String token, LambdaCallback<Document> callback);
 	}
 
 	private static Presentation presentation = new Presentation() {
 		@Override
-		public void findBySessionToken(final String token, final LambdaCallback<MongoIterator<Document>> callback) {
+		public void findBySessionToken(final String token, final LambdaCallback<Document> callback) {
 			try {
-				getCollectionPresentation().findAsync(callback, QueryBuilder.where("session.tokens.$id").equals(new ObjectId(token)));
+				getCollectionPresentation().findOneAsync(callback, QueryBuilder.where("session.tokens.$id").equals(new ObjectId(token)));
 			} catch (final Exception e) {
 				LOGGER.error("Error occured on call to MongoDb", e);
 				callback.accept(e, null);

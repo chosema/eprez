@@ -1,4 +1,5 @@
 module.exports = angular.module('eprezApp.controllers', [])
-		.controller('bodyController', require('./bodyController'))
+		.controller('rootController', require('./rootController'))
 		.controller('recorderController', require('./recorderController'))
+		.controller('playerController', require('./playerController'))
         .controller('documentCarouselController', require('./documentCarouselController'))

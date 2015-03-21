@@ -5,6 +5,8 @@ import java.io.Serializable;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class DocumentPage implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -13,6 +15,7 @@ public class DocumentPage implements Serializable {
 	private int index;
 	private String format;
 
+	@JsonIgnore
 	@DBRef(lazy = true)
 	private Data data;
 
@@ -49,10 +52,12 @@ public class DocumentPage implements Serializable {
 		this.format = imageFormat;
 	}
 
+	@JsonIgnore
 	public Data getData() {
 		return data;
 	}
 
+	@JsonIgnore
 	public void setData(final Data data) {
 		this.data = data;
 	}

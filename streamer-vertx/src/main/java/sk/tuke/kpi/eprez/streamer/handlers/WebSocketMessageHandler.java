@@ -21,6 +21,9 @@ public class WebSocketMessageHandler implements Handler<Buffer> {
 	private final Map<String, List<Handler<Buffer>>> handlers = new HashMap<>();
 	private Handler<Buffer> defaultHandler;
 
+	public WebSocketMessageHandler() { // do nothing
+	}
+
 	public WebSocketMessageHandler(final ServerWebSocket socket) {
 		socket.dataHandler(this);
 	}
@@ -68,5 +71,9 @@ public class WebSocketMessageHandler implements Handler<Buffer> {
 
 	public MulticastHandlerPump pump(final String message) {
 		return MulticastHandlerPump.createPump(message, this);
+	}
+
+	public MulticastHandlerPump pump(final MulticastHandlerPump pump) {
+		return pump;
 	}
 }

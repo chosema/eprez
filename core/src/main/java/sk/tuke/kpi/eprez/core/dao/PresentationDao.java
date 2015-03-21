@@ -21,5 +21,7 @@ public interface PresentationDao extends MongoRepository<Presentation, String> {
 
 	Page<Presentation> findByCreatedByAndCategories(User user, List<PresentationCategory> categories, Pageable pageable);
 
+	Presentation findBySessionTokensId(String sessionToken);
+
 	long countBySessionTokens();
 }

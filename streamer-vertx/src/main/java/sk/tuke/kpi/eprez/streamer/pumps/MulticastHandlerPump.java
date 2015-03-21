@@ -5,7 +5,7 @@ import sk.tuke.kpi.eprez.streamer.handlers.WebSocketMessageHandler;
 public class MulticastHandlerPump extends AbstractMulticastPump {
 
 	private final String message;
-	private final WebSocketMessageHandler handler;
+	private WebSocketMessageHandler handler;
 
 	private MulticastHandlerPump(final String message, final WebSocketMessageHandler handler, final int maxWriteQueueSize) {
 		super(maxWriteQueueSize);
@@ -18,19 +18,36 @@ public class MulticastHandlerPump extends AbstractMulticastPump {
 		this.handler = handler;
 	}
 
+	private MulticastHandlerPump(final String message) {
+		this.message = message;
+	}
+
+	public static MulticastHandlerPump createPump(final String message) {
+		return new MulticastHandlerPump(message);
+	}
+
 	public static MulticastHandlerPump createPump(final String message, final WebSocketMessageHandler socketMessageHandler) {
 		return new MulticastHandlerPump(message, socketMessageHandler);
 	}
 
+	public MulticastHandlerPump handler(final WebSocketMessageHandler handler) {
+		this.handler = handler;
+		return this;
+	}
+
 	@Override
 	public MulticastHandlerPump start() {
-		handler.on(message, dataHandler);
+		if (handler != null) {
+			handler.on(message, dataHandler);
+		}
 		return this;
 	}
 
 	@Override
 	public MulticastHandlerPump stop() {
-		handler.cancel(message);
+		if (handler != null) {
+			handler.cancel(message);
+		}
 		return this;
 	}
 }
