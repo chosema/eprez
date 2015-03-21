@@ -43,7 +43,7 @@
 								<h:outputText value="#{presentation.name}" styleClass="big" />
 								<f:param name="id" value="#{presentation.id}" />
 							</h:outputLink>
-							<h:outputText value="#{presentation.description == null ? '' : presentation.description.substring(0, 500)}..."
+							<h:outputText value="#{presentation.description == null ? '' : (presentation.description.length() > 500 ? presentation.description.substring(0, 500) : presentation.description)}..."
 								styleClass="small" />
 							<p:outputPanel styleClass="small">
 								<ul title="Categories" class="ui-autocomplete-multiple-container ui-widget ui-inputfield ui-state-default ui-corner-all no-border">

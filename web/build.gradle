@@ -1,23 +1,7 @@
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'io.spring.gradle:dependency-management-plugin:0.3.0.RELEASE'
-    }
-}
-
-apply plugin: 'io.spring.dependency-management'
 apply plugin: 'war'
 
 repositories {
      maven { url "http://repository.primefaces.org" }
-}
-
-dependencyManagement {
-    imports {
-        mavenBom 'io.spring.platform:platform-bom:1.1.1.RELEASE'
-    }
 }
 
 dependencies {
@@ -35,10 +19,6 @@ dependencies {
     compile 'com.fasterxml.jackson.core:jackson-databind'
 
     compile 'commons-fileupload:commons-fileupload'
-
-    testCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-test') {
-		exclude(module: 'commons-logging')
-    }
 
     providedCompile 'javax.servlet:javax.servlet-api:3.0.1'
 }

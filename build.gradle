@@ -1,7 +1,27 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'io.spring.gradle:dependency-management-plugin:0.3.0.RELEASE'
+    }
+}
+
 subprojects {
+
+	buildscript {
+	    repositories {
+	        jcenter()
+	    }
+	    dependencies {
+	        classpath 'io.spring.gradle:dependency-management-plugin:0.3.0.RELEASE'
+	    }
+	}
+
     apply plugin: 'java'
     apply plugin: 'eclipse-wtp'
     apply plugin: 'maven'
+    apply plugin: 'io.spring.dependency-management'
 
 	group = 'sk.tuke.kpi.eprez'
 	version = '0.0.1'
@@ -22,6 +42,22 @@ subprojects {
 
 	sourceSets {
 		main { compileClasspath += configurations.provided }
+	}
+
+	dependencyManagement {
+	    imports {
+	        mavenBom 'io.spring.platform:platform-bom:1.1.1.RELEASE'
+	    }
+	}
+
+	dependencies {
+		compile 'org.apache.commons:commons-lang3'
+		compile 'commons-collections:commons-collections'
+		compile 'commons-io:commons-io'
+
+		testCompile('org.springframework.boot:spring-boot-starter-test') {
+			exclude(module: 'commons-logging')
+	    }
 	}
 
     eclipse.classpath.plusConfigurations += [configurations.provided]

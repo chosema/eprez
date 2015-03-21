@@ -41,7 +41,7 @@ public class PresenterWebSocketHandler implements Handler<ServerWebSocket> {
 			socketMessageHandler.on("send:document.stream.publish", buffer -> {
 				LOGGER.info("New document published: " + buffer);
 				final String encodedMessage = new JsonObject().putString("type", "push:document.stream.publish").putString("content", buffer.toString()).encode();
-				vertx.eventBus().publish(EventBusAddressHolder.presentationDocumentStream(presentationId), encodedMessage);
+				vertx.setTimer(5000, event -> vertx.eventBus().publish(EventBusAddressHolder.presentationDocumentStream(presentationId), encodedMessage));
 				socket.writeTextFrame(encodedMessage);
 			});
 

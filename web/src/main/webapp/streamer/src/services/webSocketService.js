@@ -87,6 +87,9 @@ module.exports = [ '$q', 'dataService', function($q, dataService) {
 				messageHandlers[type] = typeHandlers = [];
 			}
 			typeHandlers.push(callback);
+		},
+		connected: function() {
+			return ws != null;
 		}
 	}
 }];
