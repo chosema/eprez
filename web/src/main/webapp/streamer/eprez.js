@@ -17,42 +17,54 @@ module.exports = [ '$scope', 'webSocketService', function($scope, webSocketServi
 			$scope.onNextSlide();
 		}
 	});
-
+	
+	var sliding = false;
 	var documentCarousel = jQuery('#document-carousel');
 	documentCarousel.carousel({
-		interval: false
+		interval: false,
+		keyboard: false
+	});
+	documentCarousel.on('slide.bs.carousel', function() {
+		sliding = true;
+	});
+	documentCarousel.on('slid.bs.carousel', function() {
+		sliding = false;
 	});
 
 	webSocketService.on('push:document.stream.publish', function(message) {
 		console.log('Received new document page index: ' + message);
-		setSlide(parseInt(message));
+		setSlide(parseInt(message), true);
 	});
 
 	$scope._loaded.then(function() {
 		var currentIndex = $scope._presentation.session.currentPageIndex;
 		var pages = $scope._presentation.document.pages;
 		if (pages && pages[currentIndex]) {
-			setPageData(pages[currentIndex], false);
-			setPageData(pages[currentIndex], true);
+			setSlide(currentIndex, false);
 		}
 	});
 
 	$scope.onPreviousSlide = function() {
-		if ($scope._presentation.session.currentPageIndex > 0) {
+		if (!sliding && $scope._presentation.session.currentPageIndex > 0) {
 			var index = $scope._presentation.session.currentPageIndex;
     		webSocketService.send('send:document.stream.publish', index - 1);
 		}
     };
     $scope.onNextSlide = function() {
-    	if ($scope._presentation.session.currentPageIndex < $scope._presentation.document.pages.length - 1) {
+    	if (!sliding && $scope._presentation.session.currentPageIndex < $scope._presentation.document.pages.length - 1) {
     		var index = $scope._presentation.session.currentPageIndex;
     		webSocketService.send('send:document.stream.publish', index + 1);
     	}
     };
+    $scope.onSlide = function(index) {
+    	if (!sliding && index >= 0 && index < $scope._presentation.document.pages.length && index != $scope._presentation.session.currentPageIndex) {
+    		webSocketService.send('send:document.stream.publish', index);
+    	}
+    };
 
-    function setSlide(index) {
+    function setSlide(index, applyScope) {
     	$scope._presentation.session.currentPageIndex = index;
-		setPageData($scope._presentation.document.pages[index], true, function() {
+		setPageData($scope._presentation.document.pages[index], applyScope, function() {
 			documentCarousel.carousel(index);
 		});
     }
@@ -71,6 +83,9 @@ module.exports = [ '$scope', 'webSocketService', function($scope, webSocketServi
     		}
     		jQuery("<img />").load(sucessCallback).error(errorCallback).attr("src", page.src);
     	} else if (sucessCallback) {
+    		if (apply) {
+    			$scope.$apply();
+    		}
     		sucessCallback();
     	}
     }

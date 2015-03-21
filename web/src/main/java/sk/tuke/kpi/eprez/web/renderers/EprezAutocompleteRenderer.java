@@ -22,7 +22,7 @@ public class EprezAutocompleteRenderer extends AutoCompleteRenderer {
 		final ResponseWriter writer = context.getResponseWriter();
 		final String clientId = ac.getClientId(context);
 		final String inputId = clientId + "_input";
-		final List values = (List) ac.getValue();
+		final List<?> values = (List<?>) ac.getValue();
 		final List<String> stringValues = new ArrayList<String>();
 		final boolean disabled = ac.isDisabled();
 		final String tabindex = ac.getTabindex();
@@ -46,7 +46,7 @@ public class EprezAutocompleteRenderer extends AutoCompleteRenderer {
 			final String var = ac.getVar();
 			final boolean pojo = var != null;
 
-			for (final Iterator<Object> it = values.iterator(); it.hasNext();) {
+			for (final Iterator<?> it = values.iterator(); it.hasNext();) {
 				final Object value = it.next();
 				Object itemValue = null;
 				String itemLabel = null;

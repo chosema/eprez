@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
 <!-- Font Awesome Icons -->
-<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
 <link href="eprez.css" rel="stylesheet">
 
@@ -22,7 +22,7 @@
       <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
-    
+
 <%
 	final String _streamerHttpPath = WebApplicationContextUtils.getWebApplicationContext(getServletContext()).getEnvironment().resolvePlaceholders("${streamer.http.url}");
 	final String _streamerWsPath = WebApplicationContextUtils.getWebApplicationContext(getServletContext()).getEnvironment().resolvePlaceholders("${streamer.ws.url}");
@@ -56,18 +56,16 @@
 		</div>
 	</nav>
 
-	<div id="document-carousel" class="carousel slide" style="height: 100%;" ng-controller="documentCarouselController">
+	<div id="document-carousel" class="slide" style="height: 100%;" ng-controller="documentCarouselController">
 		<!-- Indicators -->
 		<ol class="carousel-indicators">
 			<li ng-repeat="page in _presentation.document.pages" title="Slide: {{page.index + 1}}" ng-class="_presentation.session.currentPageIndex == $index ? 'active' : ''"
-				style="margin-right: 10px;"></li>
+				ng-click="_userIsPresenter && onSlide($index)" style="margin-right: 10px;"></li>
 		</ol>
 
 		<!-- Wrapper for slides -->
 		<div class="carousel-inner" role="listbox">
-			<div class="item" ng-repeat="page in _presentation.document.pages" ng-class="_presentation.session.currentPageIndex == $index ? 'active' : ''" ng-style="page.style">
-				<!-- ng-style="page.style" -->
-				<!-- <img ng-src="{{page.src}}" style="height: 100%; margin: 0 auto; display: block;"> -->
+			<div class="item" ng-class="$index == 0 ? 'active' : ''" ng-repeat="page in _presentation.document.pages" ng-style="page.style">
 				<div class="carousel-caption" style="color: gray;">Current slide: {{page.index + 1}}</div>
 			</div>
 		</div>
