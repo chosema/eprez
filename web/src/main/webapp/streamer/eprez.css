@@ -1,5 +1,13 @@
-html, body {
-	height: 100%;
+/* html, body { */
+/* 	height: 100%; */
+/* } */
+
+.navbar.navbar-static-top {
+	opacity: 0.8;
+}
+
+.navbar.navbar-static-top:hover {
+	opacity: 1;
 }
 
 /* Carousel normalization */
@@ -11,19 +19,19 @@ html, body {
 	background-color: #6B6B6B;
 }
 
-.carousel-inner {
-	height: 100%;
-}
+/* .carousel-inner { */
+/* 	height: 100%; */
+/* } */
 
-.carousel-inner .item {
-	height: 100%;
-	-webkit-background-size: cover;
-	-moz-background-size: cover;
-	-o-background-size: cover;
-	background-size: cover;
-	color: #fff;
-	background-color: #333;
-	
-	border-left: 1px solid gray;
-	border-right: 1px solid gray;
-}
+/* .carousel-inner .item { */
+/* 	height: 100%; */
+/* 	-webkit-background-size: cover; */
+/* 	-moz-background-size: cover; */
+/* 	-o-background-size: cover; */
+/* 	background-size: cover; */
+/* 	color: #fff; */
+/* 	background-color: rgb(34, 45, 50); */
+
+/* 	border-left: 1px solid #367fa9; */
+/* 	border-right: 1px solid #367fa9; */
+/* } */
