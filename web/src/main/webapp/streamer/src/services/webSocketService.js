@@ -29,6 +29,9 @@ module.exports = [ '$q', 'dataService', function($q, dataService) {
 					for (var i = 0; i < typeHandlers.length; i++) {
 						typeHandlers[i](data.content, message);
                     }
+				} else {
+					console.log('Received message with no handlers:');
+					console.log(message);
 				}
 			}
 		});

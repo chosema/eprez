@@ -53,8 +53,8 @@
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 				</a>
-				<form class="navbar-form navbar-left" ng-controller="recorderController" ng-show="_userIsPresenter">
-					<div class="form-group">
+				<form class="navbar-form navbar-left">
+					<div class="form-group" ng-controller="recorderController" ng-show="_userIsPresenter">
 						<select class="form-control" ng-model="samplerate" ng-options="'Sample Rate: ' + s + ' Hz' for s in samplerates"></select>
 						<select class="form-control" ng-model="bitrate" ng-options="'Bit Rate: ' + b + ' kbps' for b in bitrates"></select>
 						<div class="btn-group">
@@ -67,12 +67,12 @@
 						</div>
 						<span ng-show="recording" style="color: white;">Recording...</span>
 					</div>
+					<div style="height: 20px;" ng-controller="playerController" ng-show="!_userIsPresenter">
+						<audio id="player" controls>
+							<source id="playerSource" />
+						</audio>
+					</div>
 				</form>
-				<div class="container" ng-controller="playerController" ng-show="!_userIsPresenter">
-					<audio id="player" style="margin-top: 8px;" controls>
-						<source id="playerSource" />
-					</audio>
-				</div>
 				<!-- Navbar Right Menu -->
 				<div class="navbar-custom-menu">
 					<ul class="nav navbar-nav">
@@ -161,15 +161,16 @@
 						</li>
 						<!-- User Account: style can be found in dropdown.less -->
 						<li class="dropdown user user-menu">
-							<a href="#" class="dropdown-toggle" data-toggle="dropdown"> <img src="dist/img/user2-160x160.jpg"
-								class="user-image" alt="User Image" /> <span class="hidden-xs">Alexander Pierce</span>
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+								<img ng-src="{{_user.identicon}}" class="user-image" alt="User Image" />
+								<span class="hidden-xs">{{_user.displayName}}</span>
 							</a>
 							<ul class="dropdown-menu">
 								<!-- User image -->
 								<li class="user-header">
-									<img src="dist/img/user2-160x160.jpg" class="img-circle" alt="User Image" />
+									<img ng-src="{{_user.identicon}}" alt="User Image" />
 									<p>
-										Alexander Pierce - Web Developer <small>Member since Nov. 2012</small>
+										{{_user.displayName}} <small>{{_user.email}}</small>
 									</p>
 								</li>
 								<!-- Menu Body -->
@@ -190,7 +191,7 @@
 										<a href="#" class="btn btn-default btn-flat">Profile</a>
 									</div>
 									<div class="pull-right">
-										<a href="#" class="btn btn-default btn-flat">Sign out</a>
+										<a href="<%=request.getContextPath()%>/logout" class="btn btn-default btn-flat">Sign out</a>
 									</div>
 								</li>
 							</ul>
@@ -202,15 +203,14 @@
 
 		<aside class="main-sidebar">
 			<!-- sidebar: style can be found in sidebar.less -->
-			<section class="sidebar">
+			<section class="sidebar" ng-controller="listenersController">
 				<!-- Sidebar user panel -->
 				<div class="user-panel">
 					<div class="pull-left image">
-						<img src="../../dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+						<img ng-src="{{_user.identicon}}" alt="User Image">
 					</div>
 					<div class="pull-left info">
-						<p>Alexander Pierce</p>
-
+						<p>{{_user.displayName}}</p>
 						<a href="#"><i class="fa fa-circle text-success"></i> Online</a>
 					</div>
 				</div>
@@ -227,31 +227,18 @@
 				<!-- /.search form -->
 				<!-- sidebar menu: : style can be found in sidebar.less -->
 				<ul class="sidebar-menu">
-					<li class="header">MAIN NAVIGATION</li>
-					<li class="treeview">
-						<a href="#"> <i class="fa fa-dashboard"></i> <span>Dashboard</span> <i class="fa fa-angle-left pull-right"></i>
-						</a>
-						<ul class="treeview-menu">
-							<li>
-								<a href="../../index.html"><i class="fa fa-circle-o"></i> Dashboard v1</a>
-							</li>
-							<li>
-								<a href="../../index2.html"><i class="fa fa-circle-o"></i> Dashboard v2</a>
-							</li>
-						</ul>
-					</li>
-					<li>
-						<a href="../../documentation/index.html"><i class="fa fa-book"></i> Documentation</a>
-					</li>
-					<li class="header">LABELS</li>
-					<li>
-						<a href="#"><i class="fa fa-circle-o text-danger"></i> Important</a>
-					</li>
-					<li>
-						<a href="#"><i class="fa fa-circle-o text-warning"></i> Warning</a>
-					</li>
-					<li>
-						<a href="#"><i class="fa fa-circle-o text-info"></i> Information</a>
+					<li class="header">Connected users</li>
+					<li ng-repeat="userToken in _presentation.session.tokens | filter: { presenter: false }">
+						<div class="user-panel">
+							<div class="pull-left image">
+								<img ng-src="{{userToken.user.identicon}}" alt="User Image">
+							</div>
+							<div class="pull-left info">
+								<p>{{userToken.user.displayName}}</p>
+								<a href="#" ng-show="userToken.online"><i class="fa fa-circle text-success"></i> Online</a>
+								<a href="#" ng-show="!userToken.online"><i class="fa fa-circle" style="color: rgb(187, 187, 187);"></i> Offline</a>
+							</div>
+						</div>
 					</li>
 				</ul>
 			</section>
@@ -304,7 +291,10 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular-resource.min.js" type="text/javascript"></script>
 	<!-- AdminLTE App -->
     <script src="../resources/adminLTE/js/app.min.js" type="text/javascript"></script>
+    <!-- Identicon library with PNG dependency -->
+    <script src="pnglib.js" type="text/javascript"></script>
+    <script src="identicon.js" type="text/javascript"></script>
 	<!-- JavaScript main eprez bundle -->
-	<script src="eprez.js"></script>
+	<script src="eprez.js" type="text/javascript"></script>
 </body>
 </html>

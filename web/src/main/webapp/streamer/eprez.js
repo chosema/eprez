@@ -4,8 +4,9 @@ module.exports = angular.module('eprezApp.controllers', [])
 		.controller('recorderController', require('./recorderController'))
 		.controller('playerController', require('./playerController'))
         .controller('documentCarouselController', require('./documentCarouselController'))
+        .controller('listenersController', require('./listenersController'))
 
-},{"./documentCarouselController":"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\controllers\\documentCarouselController.js","./playerController":"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\controllers\\playerController.js","./recorderController":"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\controllers\\recorderController.js","./rootController":"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\controllers\\rootController.js"}],"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\controllers\\documentCarouselController.js":[function(require,module,exports){
+},{"./documentCarouselController":"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\controllers\\documentCarouselController.js","./listenersController":"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\controllers\\listenersController.js","./playerController":"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\controllers\\playerController.js","./recorderController":"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\controllers\\recorderController.js","./rootController":"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\controllers\\rootController.js"}],"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\controllers\\documentCarouselController.js":[function(require,module,exports){
 module.exports = [ '$scope', 'webSocketService', function($scope, webSocketService) {
 
 	jQuery(document).on('keydown', function(event) {
@@ -90,6 +91,23 @@ module.exports = [ '$scope', 'webSocketService', function($scope, webSocketServi
     	}
     }
 }]
+
+},{}],"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\controllers\\listenersController.js":[function(require,module,exports){
+module.exports = [ '$scope', '$q', 'webSocketService', function($scope, $q, webSocketService) {
+
+	webSocketService.on('push:presentation.listeners', function(message) {
+		console.log('Received active listeners change: ' + message);
+		var userTokens = $scope._presentation.session.tokens;
+		if (userTokens) {
+			for (var i = 0; i < userTokens.length; i++) {
+	            var token = userTokens[i];
+	            token.online = message.indexOf(token.id) != -1;
+            }
+		}
+		$scope.$apply();
+	});
+
+}];
 
 },{}],"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\controllers\\playerController.js":[function(require,module,exports){
 module.exports = [ '$scope', function($scope) {
@@ -213,8 +231,24 @@ module.exports = [ '$scope', '$q', 'dataService', function($scope, $q, dataServi
 		$scope._presentation = $scope._info.presentation;
 		$scope._user = $scope._info.user;
 		$scope._userIsPresenter = $scope._info.userIsPresenter;
+
+		setDisplayName($scope._user);
+		setIdenticon($scope._user);
+
+		for (var i = 0; i < $scope._presentation.session.tokens.length; i++) {
+	        var userToken = $scope._presentation.session.tokens[i];
+	        setDisplayName(userToken.user);
+	        setIdenticon(userToken.user);
+        }
 	});
 
+	function setDisplayName(user) {
+		return user.displayName = (user.firstName && user.lastName ? (user.firstName + ' ' + user.lastName) : user.login);
+	}
+	function setIdenticon(user) {
+		var prefix = 'data:image/png;base64,';
+		return user.identicon = (prefix + new Identicon(user.id, 160).toString());
+	}
 }];
 
 },{}],"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\main.js":[function(require,module,exports){
@@ -311,6 +345,9 @@ module.exports = [ '$q', 'dataService', function($q, dataService) {
 					for (var i = 0; i < typeHandlers.length; i++) {
 						typeHandlers[i](data.content, message);
                     }
+				} else {
+					console.log('Received message with no handlers:');
+					console.log(message);
 				}
 			}
 		});

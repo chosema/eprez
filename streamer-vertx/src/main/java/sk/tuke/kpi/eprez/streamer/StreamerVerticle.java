@@ -49,5 +49,4 @@ public class StreamerVerticle extends Verticle {
 
 		httpServer.listen(port);
 	}
-
 }

@@ -55,6 +55,9 @@ subprojects {
 		compile 'commons-collections:commons-collections'
 		compile 'commons-io:commons-io'
 
+		compile 'org.slf4j:slf4j-api:1.7.10'
+		compile 'ch.qos.logback:logback-classic'
+
 		testCompile('org.springframework.boot:spring-boot-starter-test') {
 			exclude(module: 'commons-logging')
 	    }
@@ -65,5 +68,4 @@ subprojects {
     jar {
         manifest.attributes provider: 'Peter Chovanec'
     }
-
 }

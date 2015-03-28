@@ -9,6 +9,7 @@ import org.vertx.java.core.json.JsonObject;
 
 import sk.tuke.kpi.eprez.streamer.EventBusAddressHolder;
 import sk.tuke.kpi.eprez.streamer.SharedData;
+import sk.tuke.kpi.eprez.streamer.helpers.ConnectedListenersHelper;
 
 import com.allanbank.mongodb.bson.element.ObjectId;
 
@@ -34,6 +35,10 @@ public class PresenterWebSocketHandler implements Handler<ServerWebSocket> {
 			final String presentationId = ((ObjectId) result.get("_id").getValueAsObject()).toHexString();
 			final String audioStreamAddress = EventBusAddressHolder.presentationAudioStream(presentationId);
 
+			/* add connected listener */
+			final ConnectedListenersHelper connectedListenersHelper = new ConnectedListenersHelper(vertx, socket);
+			connectedListenersHelper.addListener(presentationId, sessionToken);
+
 			final WebSocketMessageHandler socketMessageHandler = new WebSocketMessageHandler(socket);
 			socketMessageHandler.on("send:audio.stream.publish", buffer -> {
 				vertx.eventBus().publish(audioStreamAddress, buffer);
@@ -47,6 +52,7 @@ public class PresenterWebSocketHandler implements Handler<ServerWebSocket> {
 
 			socket.closeHandler(socketCloseEvent -> {
 				LOGGER.info("Closing socket");
+				connectedListenersHelper.removeListener(presentationId, sessionToken);
 			});
 
 //			final String fileName = RECORDING_FILES + token + ".mp3";
