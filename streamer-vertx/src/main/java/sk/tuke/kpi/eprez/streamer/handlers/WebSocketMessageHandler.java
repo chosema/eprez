@@ -18,6 +18,8 @@ public class WebSocketMessageHandler implements Handler<Buffer> {
 	private static final byte BYTE_SEPARATOR = 0;
 	private static final Charset CHARSET_UTF_8 = Charset.forName("UTF-8");
 
+	private ServerWebSocket socket;
+
 	private final Map<String, List<Handler<Buffer>>> handlers = new HashMap<>();
 	private Handler<Buffer> defaultHandler;
 
@@ -25,7 +27,12 @@ public class WebSocketMessageHandler implements Handler<Buffer> {
 	}
 
 	public WebSocketMessageHandler(final ServerWebSocket socket) {
+		this.socket = socket;
 		socket.dataHandler(this);
+	}
+
+	public ServerWebSocket getSocket() {
+		return socket;
 	}
 
 	@Override

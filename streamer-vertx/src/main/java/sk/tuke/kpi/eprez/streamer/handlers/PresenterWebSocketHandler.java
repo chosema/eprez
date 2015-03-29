@@ -9,6 +9,7 @@ import org.vertx.java.core.json.JsonObject;
 
 import sk.tuke.kpi.eprez.streamer.EventBusAddressHolder;
 import sk.tuke.kpi.eprez.streamer.SharedData;
+import sk.tuke.kpi.eprez.streamer.helpers.ChatMessagesHelper;
 import sk.tuke.kpi.eprez.streamer.helpers.ConnectedListenersHelper;
 
 import com.allanbank.mongodb.bson.element.ObjectId;
@@ -35,10 +36,6 @@ public class PresenterWebSocketHandler implements Handler<ServerWebSocket> {
 			final String presentationId = ((ObjectId) result.get("_id").getValueAsObject()).toHexString();
 			final String audioStreamAddress = EventBusAddressHolder.presentationAudioStream(presentationId);
 
-			/* add connected listener */
-			final ConnectedListenersHelper connectedListenersHelper = new ConnectedListenersHelper(vertx, socket);
-			connectedListenersHelper.addListener(presentationId, sessionToken);
-
 			final WebSocketMessageHandler socketMessageHandler = new WebSocketMessageHandler(socket);
 			socketMessageHandler.on("send:audio.stream.publish", buffer -> {
 				vertx.eventBus().publish(audioStreamAddress, buffer);
@@ -50,9 +47,15 @@ public class PresenterWebSocketHandler implements Handler<ServerWebSocket> {
 				socket.writeTextFrame(encodedMessage);
 			});
 
+			/* add listeners helper */
+			final ConnectedListenersHelper connectedListenersHelper = new ConnectedListenersHelper(vertx, socket).addListener(presentationId, sessionToken);
+			/* add chat messages helper */
+			final ChatMessagesHelper chatMessagesHelper = new ChatMessagesHelper(vertx, socketMessageHandler).addListener(presentationId, sessionToken);
+
 			socket.closeHandler(socketCloseEvent -> {
 				LOGGER.info("Closing socket");
 				connectedListenersHelper.removeListener(presentationId, sessionToken);
+				chatMessagesHelper.removeListener(presentationId);
 			});
 
 //			final String fileName = RECORDING_FILES + token + ".mp3";

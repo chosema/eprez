@@ -2,12 +2,25 @@
 /* 	height: 100%; */
 /* } */
 
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+  display: none !important;
+}
+
 .navbar.navbar-static-top {
 	opacity: 0.8;
 }
 
 .navbar.navbar-static-top:hover {
 	opacity: 1;
+}
+
+.fa-spin {
+	-webkit-animation: fa-spin 1s infinite linear;
+	animation: fa-spin 1s infinite linear;
+}
+
+.box .overlay>.fa {
+	font-size: 40px;
 }
 
 /* Carousel normalization */
@@ -35,3 +48,15 @@
 /* 	border-left: 1px solid #367fa9; */
 /* 	border-right: 1px solid #367fa9; */
 /* } */
+
+.carousel-control .glyphicon {
+	color: rgb(178, 178, 178);
+}
+
+#chatBox {
+	opacity: 0.6;
+}
+#chatBox:hover,
+#chatBox.focused {
+	opacity: 1;
+}

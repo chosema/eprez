@@ -9,6 +9,7 @@ import org.vertx.java.core.http.ServerWebSocket;
 
 import sk.tuke.kpi.eprez.streamer.EventBusAddressHolder;
 import sk.tuke.kpi.eprez.streamer.SharedData;
+import sk.tuke.kpi.eprez.streamer.helpers.ChatMessagesHelper;
 import sk.tuke.kpi.eprez.streamer.helpers.ConnectedListenersHelper;
 
 import com.allanbank.mongodb.bson.element.ObjectId;
@@ -30,8 +31,11 @@ public class ListenerWebSocketHandler implements Handler<ServerWebSocket> {
 		SharedData.presentation().findBySessionToken(sessionToken, (throwable, result) -> {
 			final String presentationId = ((ObjectId) result.get("_id").getValueAsObject()).toHexString();
 
+			final WebSocketMessageHandler socketMessageHandler = new WebSocketMessageHandler(socket);
+
 			/* add connected listener */
 			final ConnectedListenersHelper connectedListenersHelper = new ConnectedListenersHelper(vertx, socket).addListener(presentationId, sessionToken);
+			final ChatMessagesHelper chatMessagesHelper = new ChatMessagesHelper(vertx, socketMessageHandler).addListener(presentationId, sessionToken);
 
 			/* presentation document handler */
 			final String presentationDocumentStreamAddress = EventBusAddressHolder.presentationDocumentStream(presentationId);
@@ -44,11 +48,13 @@ public class ListenerWebSocketHandler implements Handler<ServerWebSocket> {
 			socket.closeHandler(event -> {
 				vertx.eventBus().unregisterHandler(presentationDocumentStreamAddress, presentationDocumentStreamHandler);
 				connectedListenersHelper.removeListener(presentationId, sessionToken);
+				chatMessagesHelper.removeListener(presentationId);
 			});
 			socket.exceptionHandler(e -> {
 				LOGGER.error(e.getMessage(), e);
 				vertx.eventBus().unregisterHandler(presentationDocumentStreamAddress, presentationDocumentStreamHandler);
 				connectedListenersHelper.removeListener(presentationId, sessionToken);
+				chatMessagesHelper.removeListener(presentationId);
 			});
 		});
 

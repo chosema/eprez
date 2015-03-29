@@ -4,9 +4,86 @@ module.exports = angular.module('eprezApp.controllers', [])
 		.controller('recorderController', require('./recorderController'))
 		.controller('playerController', require('./playerController'))
         .controller('documentCarouselController', require('./documentCarouselController'))
+        .controller('chatController', require('./chatController'))
         .controller('listenersController', require('./listenersController'))
+        .controller('loadingController', require('./loadingController'))
 
-},{"./documentCarouselController":"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\controllers\\documentCarouselController.js","./listenersController":"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\controllers\\listenersController.js","./playerController":"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\controllers\\playerController.js","./recorderController":"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\controllers\\recorderController.js","./rootController":"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\controllers\\rootController.js"}],"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\controllers\\documentCarouselController.js":[function(require,module,exports){
+},{"./chatController":"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\controllers\\chatController.js","./documentCarouselController":"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\controllers\\documentCarouselController.js","./listenersController":"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\controllers\\listenersController.js","./loadingController":"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\controllers\\loadingController.js","./playerController":"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\controllers\\playerController.js","./recorderController":"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\controllers\\recorderController.js","./rootController":"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\controllers\\rootController.js"}],"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\controllers\\chatController.js":[function(require,module,exports){
+module.exports = [ '$scope', '$q', 'webSocketService', function($scope, $q, webSocketService) {
+
+	$scope.messages = [];
+	
+	$scope.newMessagesCount = 0;
+
+	webSocketService.on('push:presentation.chat.message', function(message) {
+		//console.log('Received new message:');
+		//console.log(message);
+		
+		var userToken = $scope._presentation.session.tokens.filter(function(token) {
+			return token.id == message.token;
+		});
+		
+		if (userToken && userToken.length > 0) {
+			var newMessage = {
+	            user : userToken[0].user,
+	            date : new Date(),
+	            currentUser : $scope._token == userToken[0].id,
+	            text : message.message
+	        };
+			$scope.messages.push(newMessage);
+			if (!newMessage.currentUser) {
+				$scope.newMessagesCount++;
+			}
+			$scope.$apply();
+			
+			scrollToBottom();
+		} else {
+			console.log('Received message has unknown user token');
+		}
+	});
+
+	$scope.onToggleChat = function() {
+		$scope.newMessagesCount = 0;
+		jQuery('#collapseChatBoxBtn').click();
+		$scope.onResetNewMessages();
+		$scope.onFocusChat();
+	};
+
+	$scope.onFocusChat = function() {
+		if (jQuery('#chatBox').hasClass('collapsed-box')) {
+			jQuery('#chatMessageInput').focus();
+		}
+		scrollToBottom();
+	};
+
+	$scope.onSend = function() {
+		webSocketService.send("send:presentation.chat.message", $scope.message);
+		$scope.message = null;
+	};
+	
+	$scope.onResetNewMessages = function() {
+		$scope.newMessagesCount = 0;
+	};
+
+	$scope.onSubmitMessage = function(event) {
+		if (event.keyCode == 13) { // if enter key
+			$scope.onSend();
+		}
+	}
+
+	jQuery('#chatMessageInput').on('focusin', function(e) {
+		jQuery('#chatBox').addClass('focused');
+	});
+	jQuery('#chatMessageInput').on('focusout', function(e) {
+		jQuery('#chatBox').removeClass('focused');
+	});
+	
+	function scrollToBottom() {
+		jQuery("#chatBox .direct-chat-messages").scrollTop(jQuery("#chatBox .direct-chat-messages")[0].scrollHeight);
+	}
+}];
+
+},{}],"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\controllers\\documentCarouselController.js":[function(require,module,exports){
 module.exports = [ '$scope', 'webSocketService', function($scope, webSocketService) {
 
 	jQuery(document).on('keydown', function(event) {
@@ -96,7 +173,7 @@ module.exports = [ '$scope', 'webSocketService', function($scope, webSocketServi
 module.exports = [ '$scope', '$q', 'webSocketService', function($scope, $q, webSocketService) {
 
 	webSocketService.on('push:presentation.listeners', function(message) {
-		console.log('Received active listeners change: ' + message);
+		//console.log('Received active listeners change: ' + message);
 		var userTokens = $scope._presentation.session.tokens;
 		if (userTokens) {
 			for (var i = 0; i < userTokens.length; i++) {
@@ -107,6 +184,17 @@ module.exports = [ '$scope', '$q', 'webSocketService', function($scope, $q, webS
 		$scope.$apply();
 	});
 
+}];
+
+},{}],"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\controllers\\loadingController.js":[function(require,module,exports){
+module.exports = [ '$scope', '$q', function($scope, $q) {
+
+	jQuery(document).ready(function() {
+		setTimeout(function() {
+			jQuery('#loadingIndicator').hide();
+			jQuery('#contentWrapper').show();
+		}, 2000);
+	});
 }];
 
 },{}],"C:\\Users\\pchov_000\\WorkspaceSTS\\eprez\\web\\src\\main\\webapp\\streamer\\src\\controllers\\playerController.js":[function(require,module,exports){
