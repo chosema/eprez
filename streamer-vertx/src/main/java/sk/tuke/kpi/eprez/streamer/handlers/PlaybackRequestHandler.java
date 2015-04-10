@@ -22,6 +22,8 @@ public class PlaybackRequestHandler implements Handler<HttpServerRequest> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PlaybackRequestHandler.class);
 
+	private static final int MAX_QUEUE_SIZE = 64 * 1024; // 64 kB
+
 	protected final Vertx vertx;
 
 	public PlaybackRequestHandler(final Vertx vertx) {
@@ -45,6 +47,7 @@ public class PlaybackRequestHandler implements Handler<HttpServerRequest> {
 			final String presentationId = ((ObjectId) result.get("_id").getValueAsObject()).toHexString();
 
 			final HttpServerResponse response = req.response().setChunked(true);
+			response.setWriteQueueMaxSize(MAX_QUEUE_SIZE);
 			final Handler<Message<Buffer>> audioStreamHandler = (final Message<Buffer> message) -> {
 				if (response.writeQueueFull()) {
 					LOGGER.warn("Listener [" + sessionToken + "] has reached full writing queue...can not write any more data");

@@ -15,7 +15,7 @@ import sk.tuke.kpi.eprez.streamer.pumps.MulticastHandlerPump;
 
 public class WebSocketMessageHandler implements Handler<Buffer> {
 
-	private static final byte BYTE_SEPARATOR = 0;
+	private static final byte ZERO_BYTE_SEPARATOR = 0;
 	private static final Charset CHARSET_UTF_8 = Charset.forName("UTF-8");
 
 	private ServerWebSocket socket;
@@ -38,7 +38,7 @@ public class WebSocketMessageHandler implements Handler<Buffer> {
 	@Override
 	public void handle(final Buffer buffer) {
 		final byte[] bytes = buffer.getBytes();
-		final int indexOfByteSeparator = ArrayUtils.indexOf(bytes, BYTE_SEPARATOR);
+		final int indexOfByteSeparator = ArrayUtils.indexOf(bytes, ZERO_BYTE_SEPARATOR);
 		if (indexOfByteSeparator != ArrayUtils.INDEX_NOT_FOUND) {
 			final String message = indexOfByteSeparator == 0 ? null : new String(ArrayUtils.subarray(bytes, 0, indexOfByteSeparator), CHARSET_UTF_8);
 			final Buffer data = buffer.getBuffer(indexOfByteSeparator + 1, buffer.length());

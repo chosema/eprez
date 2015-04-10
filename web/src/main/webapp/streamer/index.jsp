@@ -82,59 +82,6 @@
 								<i class="fa fa-envelope-o"></i> <span class="label label-success" ng-show="newMessagesCount > 0">{{newMessagesCount}}</span>
 							</a>
 						</li>
-						<!-- Notifications: style can be found in dropdown.less -->
-						<li class="dropdown notifications-menu">
-							<a href="#" class="dropdown-toggle" data-toggle="dropdown"> <i class="fa fa-bell-o"></i> <span
-								class="label label-warning">10</span>
-							</a>
-							<ul class="dropdown-menu">
-								<li class="header">You have 10 notifications</li>
-								<li>
-									<!-- inner menu: contains the actual data -->
-									<ul class="menu">
-										<li>
-											<a href="#"> <i class="ion ion-ios-people info"></i> Notification title
-											</a>
-										</li>
-									</ul>
-								</li>
-								<li class="footer">
-									<a href="#">View all</a>
-								</li>
-							</ul>
-						</li>
-						<!-- Tasks: style can be found in dropdown.less -->
-						<li class="dropdown tasks-menu">
-							<a href="#" class="dropdown-toggle" data-toggle="dropdown"> <i class="fa fa-flag-o"></i> <span
-								class="label label-danger">9</span>
-							</a>
-							<ul class="dropdown-menu">
-								<li class="header">You have 9 tasks</li>
-								<li>
-									<!-- inner menu: contains the actual data -->
-									<ul class="menu">
-										<li>
-											<!-- Task item -->
-											<a href="#">
-												<h3>
-													Design some buttons <small class="pull-right">20%</small>
-												</h3>
-												<div class="progress xs">
-													<div class="progress-bar progress-bar-aqua" style="width: 20%" role="progressbar" aria-valuenow="20"
-														aria-valuemin="0" aria-valuemax="100">
-														<span class="sr-only">20% Complete</span>
-													</div>
-												</div>
-											</a>
-										</li>
-										<!-- end task item -->
-									</ul>
-								</li>
-								<li class="footer">
-									<a href="#">View all tasks</a>
-								</li>
-							</ul>
-						</li>
 						<!-- User Account: style can be found in dropdown.less -->
 						<li class="dropdown user user-menu">
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown">
@@ -301,19 +248,6 @@
 		</div>
 	</div>
 
-	<div id="loadingIndicator" class="box box-default box-solid" style="position: absolute;  top: 0; left: 0; width: 100%; height: 100%;"
-		ng-controller="loadingController">
-		<div class="box-header with-border" style="text-align: center;">
-			<h3 class="box-title">Loading...</h3>
-		</div>
-		<div class="box-body"></div>
-		<!-- /.box-body -->
-		<!-- Loading (remove the following to stop the loading)-->
-		<div class="overlay">
-			<i class="fa fa-refresh fa-spin"></i>
-		</div> <!-- end loading -->
-	</div>
-
 	<!-- jQuery 1.11.2 -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js" type="text/javascript"></script>
 	<!-- FastClick plugin for mobile devices (optimize 300ms delay) -->
@@ -332,5 +266,18 @@
     <script src="identicon.js" type="text/javascript"></script>
 	<!-- JavaScript main eprez bundle -->
 	<script src="eprez.js" type="text/javascript"></script>
+
+	<div id="loadingIndicator" class="box box-default box-solid" style="position: absolute;  top: 0; left: 0; width: 100%; height: 100%;"
+		ng-controller="loadingController">
+		<div class="box-header with-border" style="text-align: center;">
+			<h3 class="box-title">Loading...</h3>
+		</div>
+		<div class="box-body"></div>
+		<!-- /.box-body -->
+		<!-- Loading (remove the following to stop the loading)-->
+		<div class="overlay">
+			<i class="fa fa-refresh fa-spin"></i>
+		</div> <!-- end loading -->
+	</div>
 </body>
 </html>

@@ -60,3 +60,7 @@
 #chatBox.focused {
 	opacity: 1;
 }
+
+#loadingIndicator + div {
+	display: none;
+}
