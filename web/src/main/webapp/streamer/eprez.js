@@ -241,7 +241,7 @@ module.exports = [ '$scope', 'webSocketService', function($scope, webSocketServi
 		console.log('INFO: start recording');
 		$scope.encoder = new Worker('encoder.js');
 		console.log('INFO: initializing encoder with samplerate=' + $scope.samplerate + ' and bitrate=' + $scope.bitrate);
-		$scope.encoder.postMessage({ cmd: 'init', config: { samplerate: $scope.samplerate, bitrate: $scope.bitrate } });
+		$scope.encoder.postMessage({ cmd: 'init', config: { samplerate_in: 44100, samplerate_out: $scope.samplerate, bitrate: $scope.bitrate, channels: 1, mode: 3 } });
 
 		$scope.encoder.onmessage = function(e) {
 			var sent = webSocketService.send('send:audio.stream.publish', e.data.buf);

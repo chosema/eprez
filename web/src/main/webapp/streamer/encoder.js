@@ -11,12 +11,13 @@ self.onmessage = function(e) {
 		mp3codec = Lame.init();
 		Lame.set_mode(mp3codec, e.data.config.mode || Lame.JOINT_STEREO);
 		Lame.set_num_channels(mp3codec, e.data.config.channels || 2);
-		Lame.set_out_samplerate(mp3codec, e.data.config.samplerate || 44100);
+		Lame.set_out_samplerate(mp3codec, e.data.config.samplerate_out || 44100);
+		Lame.set_in_samplerate(mp3codec, e.data.config.samplerate_in || 44100);
 		Lame.set_bitrate(mp3codec, e.data.config.bitrate || 128);
 		Lame.init_params(mp3codec);
 		break;
 	case 'encode':
-		var mp3data = Lame.encode_buffer_ieee_float(mp3codec, e.data.buf, e.data.buf);
+		var mp3data = Lame.encode_buffer_ieee_float(mp3codec, e.data.buf, []);
 		self.postMessage({
 		    cmd : 'data',
 		    buf : mp3data.data
