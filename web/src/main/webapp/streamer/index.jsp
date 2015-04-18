@@ -152,7 +152,7 @@
 				<!-- sidebar menu: : style can be found in sidebar.less -->
 				<ul class="sidebar-menu">
 					<li class="header">Connected users</li>
-					<li ng-repeat="userToken in _presentation.session.tokens | filter: { presenter: false }">
+					<li ng-repeat="userToken in _presentation.session.tokens | filter: { presenter: false } | limitTo: 10">
 						<div class="user-panel">
 							<div class="pull-left image">
 								<img ng-src="{{userToken.user.identicon}}" alt="User Image">

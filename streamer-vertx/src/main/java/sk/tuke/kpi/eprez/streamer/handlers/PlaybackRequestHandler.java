@@ -15,6 +15,7 @@ import org.vertx.java.core.http.HttpServerResponse;
 
 import sk.tuke.kpi.eprez.streamer.EventBusAddressHolder;
 import sk.tuke.kpi.eprez.streamer.SharedData;
+import sk.tuke.kpi.eprez.streamer.helpers.Formatter;
 
 import com.allanbank.mongodb.bson.element.ObjectId;
 
@@ -26,8 +27,14 @@ public class PlaybackRequestHandler implements Handler<HttpServerRequest> {
 
 	protected final Vertx vertx;
 
+	private final Map<String, Long[]> listenersCount = new HashMap<>();
+
 	public PlaybackRequestHandler(final Vertx vertx) {
 		this.vertx = vertx;
+		vertx.setPeriodic(5000, event -> {
+			LOGGER.info("Multicast report:" + format(listenersCount));
+		});
+
 	}
 
 	@Override
@@ -37,14 +44,10 @@ public class PlaybackRequestHandler implements Handler<HttpServerRequest> {
 		// LOGGER.error("Multicast on address " + presentationId + " is not available");
 		// req.response().setStatusCode(HttpResponseStatus.NOT_FOUND.code()).end();
 
-		final Map<String, Long> listenersCount = new HashMap<>();
-
-		final long multicastReportTimer = vertx.setPeriodic(5000, event -> {
-			LOGGER.info("Multicast report:" + format(listenersCount));
-		});
-
 		SharedData.presentation().findBySessionToken(sessionToken, (throwable, result) -> {
 			final String presentationId = ((ObjectId) result.get("_id").getValueAsObject()).toHexString();
+
+			final String audioStreamAddress = EventBusAddressHolder.presentationAudioStream(presentationId);
 
 			final HttpServerResponse response = req.response().setChunked(true);
 			response.setWriteQueueMaxSize(MAX_QUEUE_SIZE);
@@ -53,38 +56,46 @@ public class PlaybackRequestHandler implements Handler<HttpServerRequest> {
 					LOGGER.warn("Listener [" + sessionToken + "] has reached full writing queue...can not write any more data");
 				} else {
 					response.write(message.body());
+					increment(audioStreamAddress, 1, message.body().length());
 				}
 			};
 
-			final String audioStreamAddress = EventBusAddressHolder.presentationAudioStream(presentationId);
+//			LOGGER.info("Received new listener with token: " + sessionToken);
+//			LOGGER.info("Registering him on presentation eventBus stream address: " + audioStreamAddress);
 
-			LOGGER.info("Registering new listener on eventBus address: " + audioStreamAddress);
 			vertx.eventBus().registerHandler(audioStreamAddress, audioStreamHandler);
-			increment(listenersCount, audioStreamAddress);
+			increment(audioStreamAddress, 0, 1);
 			response.closeHandler(event -> {
-				LOGGER.info("Connection with listener has been lost...removing from eventBus address: " + audioStreamAddress);
-				decrement(listenersCount, audioStreamAddress);
+//				LOGGER.info("Connection with listener has been lost...removing from eventBus address: " + audioStreamAddress);
+				decrement(audioStreamAddress, 0, 1);
 				vertx.eventBus().unregisterHandler(audioStreamAddress, audioStreamHandler);
-				vertx.cancelTimer(multicastReportTimer);
 			});
 		});
 	}
 
-	public String format(final Map<String, Long> map) {
+	public String format(final Map<String, Long[]> map) {
 		final StringBuilder sb = new StringBuilder();
-		for (final Entry<String, Long> entry : map.entrySet()) {
-			sb.append("\n\taddress=").append(entry.getKey()).append(", listeners=").append(entry.getValue());
+		for (final Entry<String, Long[]> entry : map.entrySet()) {
+			sb.append("\n\taddress=").append(entry.getKey());
+			sb.append(", listeners=").append(entry.getValue()[0]);
+			sb.append(", total distributed data=" + Formatter.bytes(entry.getValue()[1]));
 		}
 		return sb.toString();
 	}
 
-	public void increment(final Map<String, Long> map, final String key) {
-		final Long currentCount = map.get(key);
-		map.put(key, currentCount == null ? 1 : (currentCount + 1));
+	public void increment(final String key, final int index, final long value) {
+		Long[] data = listenersCount.get(key);
+		if (data == null) {
+			listenersCount.put(key, data = new Long[] { 0L, 0L });
+		}
+		data[index] += value;
 	}
 
-	public void decrement(final Map<String, Long> map, final String key) {
-		final Long currentCount = map.get(key);
-		map.put(key, currentCount == null || currentCount < 1 ? 0 : (currentCount - 1));
+	public void decrement(final String key, final int index, final long value) {
+		Long[] data = listenersCount.get(key);
+		if (data == null) {
+			listenersCount.put(key, data = new Long[] { 0L, 0L });
+		}
+		data[index] -= value;
 	}
 }
